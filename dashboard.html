@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Admin Dashboard</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter', system-ui, sans-serif;
+}
+
+body{
+display:flex;
+background:#0F0F1A;
+color:#fff;
+min-height:100vh;
+}
+
+.sidebar{
+width:280px;
+background:#111827;
+height:100vh;
+color:white;
+position:fixed;
+padding:30px 20px;
+border-right:1px solid #1F2937;
+}
+
+.sidebar h2{
+margin-bottom:40px;
+text-align:center;
+font-size:28px;
+background:linear-gradient(135deg,#8A2BE2,#00D9FF);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.sidebar ul{
+list-style:none;
+}
+
+.sidebar li{
+margin:12px 0;
+}
+
+.sidebar a{
+color:#D1D5DB;
+text-decoration:none;
+font-size:16px;
+padding:12px 20px;
+display:block;
+border-radius:12px;
+transition:0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active{
+background:#1F2937;
+color:white;
+}
+
+.main{
+margin-left:280px;
+width:100%;
+padding:40px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
+padding-bottom:20px;
+border-bottom:1px solid #1F2937;
+}
+
+.header h1{
+font-size:32px;
+font-weight:700;
+}
+
+.logout{
+background:#EF4444;
+color:white;
+padding:12px 28px;
+border:none;
+cursor:pointer;
+border-radius:12px;
+font-weight:600;
+transition:0.3s;
+}
+
+.logout:hover{
+background:#DC2626;
+transform:translateY(-2px);
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:24px;
+margin-bottom:40px;
+}
+
+.card{
+background:#1F2937;
+padding:28px;
+border-radius:20px;
+border:1px solid #374151;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-6px);
+border-color:#8A2BE2;
+}
+
+.card h3{
+color:#9CA3AF;
+margin-bottom:12px;
+font-size:15px;
+font-weight:500;
+}
+
+.card h1{
+color:#fff;
+font-size:42px;
+font-weight:700;
+}
+
+.actions{
+display:flex;
+gap:16px;
+margin-bottom:40px;
+flex-wrap:wrap;
+}
+
+.actions button{
+padding:16px 28px;
+border:none;
+background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
+color:white;
+cursor:pointer;
+border-radius:14px;
+font-weight:600;
+transition:0.3s;
+}
+
+.actions button:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 20px rgba(138,43,226,0.4);
+}
+
+h2{
+margin-bottom:20px;
+font-size:24px;
+color:#E5E7EB;
+}
+
+table{
+width:100%;
+background:#1F2937;
+border-collapse:collapse;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+th,td{
+padding:18px 20px;
+text-align:left;
+border-bottom:1px solid #374151;
+}
+
+th{
+background:#111827;
+color:#E5E7EB;
+font-weight:600;
+}
+
+tr:hover{
+background:#283549;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>RouteWave</h2>
+
+<ul>
+<li><a href="dashboard.html" class="active">Dashboard</a></li>
+<li><a href="create-shipment.html">Create Shipment</a></li>
+<li><a href="manage-shipments.html">Manage Shipments</a></li>
+<li><a href="tracking.html">Tracking</a></li>
+<li><a href="#">Settings</a></li>
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+<h1>Admin Dashboard</h1>
+<button class="logout" id="logoutBtn">Logout</button>
+</div>
+
+<div class="cards">
+<div class="card">
+<h3>Total Shipments</h3>
+<h1 id="totalShipments">0</h1>
+</div>
+
+<div class="card">
+<h3>Pending</h3>
+<h1 id="pendingShipments">0</h1>
+</div>
+
+<div class="card">
+<h3>In Transit</h3>
+<h1 id="transitShipments">0</h1>
+</div>
+
+<div class="card">
+<h3>Delivered</h3>
+<h1 id="deliveredShipments">0</h1>
+</div>
+</div>
+
+<div class="actions">
+<button onclick="location.href='create-shipment.html'">
+Create New Shipment
+</button>
+
+<button onclick="location.href='manage-shipments.html'">
+Manage Shipments
+</button>
+</div>
+
+<h2>Recent Shipments</h2>
+
+<table>
+<thead>
+<tr>
+<th>Tracking ID</th>
+<th>Receiver</th>
+<th>Status</th>
+<th>Destination</th>
+</tr>
+</thead>
+<tbody id="shipmentTable">
+<tr>
+<td colspan="4" style="text-align:center; padding:40px; color:#9CA3AF;">
+No shipments available
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+await signOut(auth);
+window.location.href="admin-login.html";
+});
+</script>
+
+</body>
+</html>
