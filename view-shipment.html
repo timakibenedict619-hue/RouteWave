@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routewave • Shipment Details</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter', system-ui, sans-serif;
+}
+
+body{
+background:#0A0A0F;
+color:#E5E7EB;
+min-height:100vh;
+padding:40px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
+padding-bottom:20px;
+border-bottom:1px solid #1F2937;
+}
+
+.header h1{
+color:#F3F4F6;
+font-size:32px;
+font-weight:700;
+}
+
+.btn{
+padding:12px 24px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+text-decoration:none;
+font-weight:600;
+margin-left:12px;
+transition:0.3s;
+}
+
+.back{
+background:#374151;
+color:#E5E7EB;
+}
+
+.edit{
+background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
+color:white;
+}
+
+.card{
+background:#1F2937;
+border-radius:20px;
+padding:32px;
+margin-bottom:30px;
+border:1px solid #374151;
+}
+
+.card h2{
+margin-bottom:24px;
+color:#F3F4F6;
+border-bottom:1px solid #374151;
+padding-bottom:16px;
+font-size:24px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:24px;
+}
+
+.item{
+margin-bottom:18px;
+}
+
+.item label{
+display:block;
+font-size:14px;
+color:#9CA3AF;
+margin-bottom:6px;
+font-weight:500;
+}
+
+.item span{
+font-size:17px;
+font-weight:600;
+color:#F3F4F6;
+}
+
+.timeline{
+list-style:none;
+padding-left:20px;
+border-left:3px solid #8A2BE2;
+margin-top:10px;
+}
+
+.timeline li{
+margin-bottom:24px;
+padding-left:20px;
+position:relative;
+color:#D1D5DB;
+}
+
+.timeline li::before{
+content:"";
+position:absolute;
+left:-13px;
+top:6px;
+width:16px;
+height:16px;
+background:#00D9FF;
+border:3px solid #1F2937;
+border-radius:50%;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h1>Shipment Details</h1>
+
+<div>
+<a href="manage-shipments.html" class="btn back">← Back</a>
+<a href="#" id="editBtn" class="btn edit">Edit Shipment</a>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Shipment Information</h2>
+
+<div class="grid">
+
+<div class="item">
+<label>Tracking ID</label>
+<span id="trackingId">Loading...</span>
+</div>
+
+<div class="item">
+<label>Status</label>
+<span id="status" class="status">Loading...</span>
+</div>
+
+<div class="item">
+<label>Carrier</label>
+<span id="carrier">Loading...</span>
+</div>
+
+<div class="item">
+<label>Weight</label>
+<span id="weight">Loading...</span>
+</div>
+
+<div class="item">
+<label>Origin</label>
+<span id="origin">Loading...</span>
+</div>
+
+<div class="item">
+<label>Destination</label>
+<span id="destination">Loading...</span>
+</div>
+
+<div class="item">
+<label>Current Location</label>
+<span id="currentLocation">Loading...</span>
+</div>
+
+<div class="item">
+<label>Expected Delivery</label>
+<span id="expectedDelivery">Loading...</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Sender Information</h2>
+
+<div class="grid">
+
+<div class="item">
+<label>Name</label>
+<span id="senderName">Loading...</span>
+</div>
+
+<div class="item">
+<label>Email</label>
+<span id="senderEmail">Loading...</span>
+</div>
+
+<div class="item">
+<label>Phone</label>
+<span id="senderPhone">Loading...</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Receiver Information</h2>
+
+<div class="grid">
+
+<div class="item">
+<label>Name</label>
+<span id="receiverName">Loading...</span>
+</div>
+
+<div class="item">
+<label>Email</label>
+<span id="receiverEmail">Loading...</span>
+</div>
+
+<div class="item">
+<label>Phone</label>
+<span id="receiverPhone">Loading...</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Shipment Description</h2>
+
+<p id="description" style="line-height:1.7; color:#D1D5DB;">
+Loading...
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>Tracking Timeline</h2>
+
+<ul class="timeline" id="timeline">
+<li>Shipment Created</li>
+</ul>
+
+</div>
+
+</div>
+
+<script type="module" src="view-shipment.js"></script>
+
+</body>
+                                  </html>
