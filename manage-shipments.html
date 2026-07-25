@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Manage Shipments</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter', system-ui, sans-serif;
+}
+
+body{
+display:flex;
+background:#0A0A0F;
+color:#E5E7EB;
+min-height:100vh;
+}
+
+.sidebar{
+width:280px;
+background:#111827;
+height:100vh;
+color:white;
+position:fixed;
+padding:40px 24px;
+border-right:1px solid #1F2937;
+}
+
+.sidebar h2{
+margin-bottom:50px;
+text-align:center;
+font-size:28px;
+font-weight:800;
+letter-spacing:-1px;
+background:linear-gradient(135deg,#8A2BE2,#00D9FF);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.sidebar ul{
+list-style:none;
+}
+
+.sidebar li{
+margin:8px 0;
+}
+
+.sidebar a{
+color:#9CA3AF;
+text-decoration:none;
+font-size:15.5px;
+padding:14px 20px;
+display:block;
+border-radius:12px;
+transition:all 0.3s ease;
+font-weight:500;
+}
+
+.sidebar a:hover,
+.sidebar a.active{
+background:#1F2937;
+color:white;
+transform:translateX(6px);
+}
+
+.main{
+margin-left:280px;
+width:100%;
+padding:40px 50px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
+padding-bottom:20px;
+border-bottom:1px solid #1F2937;
+}
+
+.header h1{
+font-size:32px;
+font-weight:700;
+}
+
+.search-box{
+display:flex;
+gap:12px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.search-box input{
+flex:1;
+padding:16px 20px;
+background:#1F2937;
+border:1px solid #374151;
+border-radius:14px;
+color:#fff;
+outline:none;
+min-width:280px;
+}
+
+.search-box button{
+padding:16px 28px;
+background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
+color:white;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
+white-space:nowrap;
+}
+
+.search-box button:hover{
+transform:translateY(-3px);
+}
+
+table{
+width:100%;
+background:#1F2937;
+border-collapse:collapse;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+th,td{
+padding:20px 24px;
+text-align:left;
+border-bottom:1px solid #374151;
+}
+
+th{
+background:#111827;
+color:#E5E7EB;
+font-weight:600;
+}
+
+tr:hover{
+background:#283549;
+}
+
+.action-btn{
+padding:8px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin:4px;
+font-size:14px;
+font-weight:500;
+}
+
+.view{
+background:#3B82F6;
+}
+
+.edit{
+background:#F59E0B;
+}
+
+.delete{
+background:#EF4444;
+}
+
+.email{
+background:#22C55E;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>SwiftTrans</h2>
+
+<ul>
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="create-shipment.html">Create Shipment</a></li>
+<li><a href="manage-shipments.html" class="active">Manage Shipments</a></li>
+<li><a href="tracking.html">Tracking</a></li>
+<li><a href="#">Settings</a></li>
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+<h1>Manage Shipments</h1>
+<button onclick="location.href='create-shipment.html'">
++ New Shipment
+</button>
+</div>
+
+<div class="search-box">
+<input
+type="text"
+id="searchInput"
+placeholder="Search by Tracking ID or Receiver...">
+
+<button id="searchBtn">
+Search
+</button>
+
+<button id="refreshBtn">
+Refresh List
+</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Tracking ID</th>
+<th>Receiver</th>
+<th>Destination</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="shipmentTable">
+<tr>
+<td colspan="5" style="text-align:center; padding:60px; color:#9CA3AF;">
+Loading shipments...
+</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="module" src="manage-shipments.js"></script>
+
+</body>
+</html>
