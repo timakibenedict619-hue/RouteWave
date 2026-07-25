@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Track Shipment - RouteWave</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter', system-ui, sans-serif;
+}
+
+body{
+background:#0F0F1A;
+color:#fff;
+}
+
+header{
+background:linear-gradient(135deg, #8A2BE2 0%, #6A1B9A 100%);
+color:#fff;
+padding:30px 20px;
+text-align:center;
+}
+
+.container{
+max-width:1000px;
+margin:40px auto;
+padding:20px;
+}
+
+.search-box{
+display:flex;
+gap:12px;
+margin-bottom:30px;
+}
+
+.search-box input{
+flex:1;
+padding:18px;
+font-size:17px;
+background:#1A1A2E;
+border:1px solid #8A2BE2;
+border-radius:12px;
+color:#fff;
+outline:none;
+}
+
+.search-box button{
+padding:18px 32px;
+background:linear-gradient(135deg, #8A2BE2 0%, #00D9FF 100%);
+color:#fff;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+}
+
+.card{
+display:none;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+padding:30px;
+border-radius:16px;
+border:1px solid rgba(255,255,255,0.1);
+margin-bottom:25px;
+}
+
+.card h2{
+color:#00D9FF;
+margin-bottom:25px;
+font-size:1.8rem;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.item{
+margin-bottom:15px;
+}
+
+.item label{
+display:block;
+font-size:14px;
+color:#aaa;
+margin-bottom:6px;
+}
+
+.item span{
+font-weight:600;
+font-size:16px;
+color:#fff;
+}
+
+.progress{
+margin:30px 0;
+}
+
+.progress-bar{
+height:18px;
+background:#1A1A2E;
+border-radius:20px;
+overflow:hidden;
+border:1px solid #8A2BE2;
+}
+
+.progress-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg, #8A2BE2, #00D9FF);
+transition:.4s;
+}
+
+.timeline{
+list-style:none;
+border-left:4px solid #8A2BE2;
+padding-left:25px;
+margin-top:20px;
+}
+
+.timeline li{
+margin-bottom:25px;
+position:relative;
+}
+
+.timeline li::before{
+content:"";
+position:absolute;
+left:-28px;
+top:6px;
+width:16px;
+height:16px;
+background:#00D9FF;
+border:3px solid #0F0F1A;
+border-radius:50%;
+}
+
+.status{
+display:inline-block;
+padding:8px 22px;
+background:#4CAF50;
+color:#fff;
+border-radius:30px;
+font-weight:500;
+}
+
+.not-found{
+display:none;
+background:#ffebee;
+color:#c62828;
+padding:25px;
+border-radius:12px;
+text-align:center;
+margin:20px 0;
+}
+
+footer{
+text-align:center;
+padding:30px;
+color:#777;
+margin-top:60px;
+font-size:0.95rem;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>Shipment Tracking</h1>
+<p>Real-time tracking • Transithive</p>
+</header>
+
+<div class="container">
+
+<div class="search-box">
+<input
+type="text"
+id="trackingInput"
+placeholder="Enter Tracking Number (e.g. ST-3928471)">
+
+<button id="trackBtn">
+Track Shipment
+</button>
+</div>
+
+<div class="not-found" id="notFound">
+Shipment not found. Please check your tracking number.
+</div>
+
+<div class="card" id="resultCard">
+<h2>Shipment Information</h2>
+
+<div class="grid">
+<div class="item">
+<label>Tracking ID</label>
+<span id="trackingId"></span>
+</div>
+
+<div class="item">
+<label>Status</label>
+<span class="status" id="status"></span>
+</div>
+
+<div class="item">
+<label>Origin</label>
+<span id="origin"></span>
+</div>
+
+<div class="item">
+<label>Destination</label>
+<span id="destination"></span>
+</div>
+
+<div class="item">
+<label>Current Location</label>
+<span id="currentLocation"></span>
+</div>
+
+<div class="item">
+<label>Expected Delivery</label>
+<span id="expectedDelivery"></span>
+</div>
+
+<div class="item">
+<label>Carrier</label>
+<span id="carrier"></span>
+</div>
+
+<div class="item">
+<label>Weight</label>
+<span id="weight"></span>
+</div>
+</div>
+
+<div class="progress">
+<h3>Delivery Progress</h3>
+<br>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+</div>
+
+<h2>Tracking History</h2>
+<ul class="timeline" id="timeline"></ul>
+</div>
+
+</div>
+
+<footer>
+© 2026 RouteWave • All Rights Reserved
+</footer>
+
+<script type="module" src="tracking.js"></script>
+
+</body>
+  </html>
