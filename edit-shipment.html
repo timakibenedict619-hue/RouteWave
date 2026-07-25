@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Edit Shipment</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter', system-ui, sans-serif;
+}
+
+body{
+background:#0A0A0F;
+color:#E5E7EB;
+min-height:100vh;
+padding:40px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+background:#1F2937;
+padding:50px;
+border-radius:24px;
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
+border:1px solid #374151;
+}
+
+h1{
+color:#F3F4F6;
+margin-bottom:40px;
+text-align:center;
+font-size:32px;
+font-weight:700;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:24px;
+margin-bottom:24px;
+}
+
+.form-group{
+display:flex;
+flex-direction:column;
+}
+
+label{
+margin-bottom:10px;
+font-weight:600;
+color:#9CA3AF;
+font-size:15px;
+}
+
+input,
+select,
+textarea{
+width:100%;
+padding:16px 20px;
+background:#111827;
+border:1px solid #374151;
+border-radius:14px;
+font-size:16px;
+color:#fff;
+outline:none;
+transition:0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+border-color:#8A2BE2;
+box-shadow:0 0 0 3px rgba(138,43,226,0.2);
+}
+
+textarea{
+min-height:140px;
+resize:vertical;
+}
+
+.buttons{
+display:flex;
+gap:16px;
+margin-top:40px;
+}
+
+button,
+a{
+padding:16px 28px;
+border:none;
+border-radius:14px;
+cursor:pointer;
+font-size:16px;
+font-weight:600;
+text-decoration:none;
+transition:0.4s;
+}
+
+.save{
+background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
+color:white;
+}
+
+.cancel{
+background:#374151;
+color:#E5E7EB;
+}
+
+@media(max-width:768px){
+.row{
+grid-template-columns:1fr;
+}
+.buttons{
+flex-direction:column;
+}
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Edit Shipment</h1>
+
+<form id="editShipmentForm">
+
+<div class="row">
+
+<div class="form-group">
+<label>Tracking ID</label>
+<input type="text" id="trackingId" readonly>
+</div>
+
+<div class="form-group">
+<label>Status</label>
+<select id="status">
+<option>Pending</option>
+<option>Processing</option>
+<option>Picked Up</option>
+<option>In Transit</option>
+<option>Arrived at Hub</option>
+<option>Customs Clearance</option>
+<option>Out For Delivery</option>
+<option>Delivered</option>
+<option>Cancelled</option>
+</select>
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Sender Name</label>
+<input type="text" id="senderName">
+</div>
+
+<div class="form-group">
+<label>Receiver Name</label>
+<input type="text" id="receiverName">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Sender Email</label>
+<input type="email" id="senderEmail">
+</div>
+
+<div class="form-group">
+<label>Receiver Email</label>
+<input type="email" id="receiverEmail">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Sender Phone</label>
+<input type="text" id="senderPhone">
+</div>
+
+<div class="form-group">
+<label>Receiver Phone</label>
+<input type="text" id="receiverPhone">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Origin</label>
+<input type="text" id="origin">
+</div>
+
+<div class="form-group">
+<label>Destination</label>
+<input type="text" id="destination">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Carrier</label>
+<input type="text" id="carrier">
+</div>
+
+<div class="form-group">
+<label>Weight</label>
+<input type="text" id="weight">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="form-group">
+<label>Current Location</label>
+<input type="text" id="currentLocation">
+</div>
+
+<div class="form-group">
+<label>Expected Delivery</label>
+<input type="date" id="expectedDelivery">
+</div>
+
+</div>
+
+<div class="form-group">
+<label>Description / Notes</label>
+<textarea id="description"></textarea>
+</div>
+
+<div class="buttons">
+<button class="save" type="submit">
+Save Changes
+</button>
+
+<a href="manage-shipments.html" class="cancel">
+Cancel
+</a>
+</div>
+
+</form>
+
+</div>
+
+<script type="module" src="edit-shipment.js"></script>
+
+</body>
+  </html>
