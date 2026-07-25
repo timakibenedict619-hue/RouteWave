@@ -1,0 +1,129 @@
+/* ======================================
+   RouteWave Logistics Admin Login
+====================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.login-container{
+    width:100%;
+    max-width:450px;
+}
+
+.login-card{
+    background:#fff;
+    border-radius:18px;
+    padding:40px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.logo{
+    width:90px;
+    height:90px;
+    margin:0 auto 20px;
+    background:#2563eb;
+    color:#fff;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:42px;
+}
+
+h1{
+    text-align:center;
+    color:#111827;
+    margin-bottom:6px;
+}
+
+p{
+    text-align:center;
+    color:#6b7280;
+    margin-bottom:30px;
+}
+
+.input-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#374151;
+    font-weight:500;
+}
+
+input{
+    width:100%;
+    padding:14px 16px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:15px;
+    transition:.3s;
+}
+
+input:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+button{
+    width:100%;
+    padding:15px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+#errorMessage{
+    margin-top:18px;
+    text-align:center;
+    color:#dc2626;
+    font-size:14px;
+    min-height:20px;
+}
+
+@media (max-width:500px){
+
+.login-card{
+    padding:28px;
+}
+
+.logo{
+    width:75px;
+    height:75px;
+    font-size:34px;
+}
+
+h1{
+    font-size:24px;
+}
+
+      }
