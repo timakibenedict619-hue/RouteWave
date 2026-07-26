@@ -1,8 +1,8 @@
 // js/email.js
 
 const EMAILJS_PUBLIC_KEY = "cxB6IjuQfdUqbn57X";
-const EMAILJS_SERVICE_ID = "service_ksh2yco";
-const EMAILJS_TEMPLATE_ID = "template_qyeceil";
+const EMAILJS_SERVICE_ID = "service_7aba1bg";
+const EMAILJS_TEMPLATE_ID = "template_4mbhfoe";
 
 // Initialize EmailJS
 export function initializeEmail() {
