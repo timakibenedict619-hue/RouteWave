@@ -226,8 +226,17 @@ window.sendEmail = async function(id){
     status: shipment.status,
     origin: shipment.origin,
     destination: shipment.destination,
-    description: shipment.description
+    description: shipment.description,
+    importantUpdate: shipment.importantUpdate
 });
+    
+    
+    
+    
+    
+    
+    
+
 
             
 
