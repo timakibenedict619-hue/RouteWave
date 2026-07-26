@@ -69,7 +69,8 @@ async function loadShipment() {
         document.getElementById("expectedDelivery").value = shipment.expectedDelivery || "";
 
         document.getElementById("description").value = shipment.description || "";
-
+        
+document.getElementById("importantUpdate").value = shipment.importantUpdate || "";
     } catch (error) {
 
         console.error(error);
@@ -137,7 +138,11 @@ form.addEventListener("submit", async (e) => {
 
             description: document.getElementById("description").value,
 
-            updatedAt: serverTimestamp(),
+importantUpdate: document.getElementById("importantUpdate").value,
+
+updatedAt: serverTimestamp(),
+
+           
 
             trackingHistory: arrayUnion(historyItem)
 
