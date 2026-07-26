@@ -59,7 +59,11 @@ shipmentForm.addEventListener("submit", async (e) => {
 
             description: document.getElementById("description").value,
 
-            createdAt: serverTimestamp()
+importantUpdate: document.getElementById("importantUpdate").value,
+
+createdAt: serverTimestamp()
+
+            
 
         });
 
