@@ -1,6 +1,6 @@
 // js/email.js
 
-const EMAILJS_PUBLIC_KEY = "2uUXjweJstqf-g-Hf";
+const EMAILJS_PUBLIC_KEY = "NyF5wd0ACUjvCSX32";
 const EMAILJS_SERVICE_ID = "service_ntia76y";
 const EMAILJS_TEMPLATE_ID = "template_3flpe89";
 
