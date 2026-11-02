@@ -104,6 +104,7 @@ shipmentForm.addEventListener("submit", async (e) => {
             items: readItems(document.getElementById("itemsEditor")),
 
             trackingHistory: [{
+                at: Date.now(),
                 status: status,
                 location: currentLocation,
                 date: new Date().toLocaleDateString(),

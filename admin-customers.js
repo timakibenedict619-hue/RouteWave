@@ -84,6 +84,54 @@ async function fundByTrackingId(trackingId, amount, note) {
 
 }
 
+// Debit a customer's balance (withdrawal). Checked inside the transaction,
+// so the balance can never go below zero.
+async function withdrawByTrackingId(trackingId, amount, note) {
+
+    if (!(amount > 0)) {
+        throw new Error("Enter an amount greater than 0.");
+    }
+
+    const snap = await getDocs(
+        query(
+            collection(db, "users"),
+            where("trackingId", "==", trackingId.trim().toUpperCase())
+        )
+    );
+
+    if (snap.empty) {
+        throw new Error("No customer found with that tracking ID.");
+    }
+
+    const userRef = snap.docs[0].ref;
+
+    const result = await runTransaction(db, async (tx) => {
+
+        const userSnap = await tx.get(userRef);
+        const current = Number(userSnap.data().balance || 0);
+
+        if (amount > current) {
+            throw new Error(`Not enough funds. Available balance is ${money(current)}.`);
+        }
+
+        tx.update(userRef, { balance: current - amount });
+
+        tx.set(doc(collection(db, "users", userRef.id, "transactions")), {
+            amount: amount,
+            type: "debit",
+            note: note || "Withdrawal",
+            by: auth.currentUser?.email || "",
+            createdAt: serverTimestamp()
+        });
+
+        return { name: userSnap.data().name, balance: current - amount };
+
+    });
+
+    return result;
+
+}
+
 // Suggest tracking IDs from shipments that don't have an account yet
 async function loadTrackingSuggestions() {
 
@@ -210,6 +258,36 @@ $("fundForm").addEventListener("submit", async (e) => {
 
         console.error(error);
         setMsg("fundMsg", error.message, false);
+
+    }
+
+});
+
+// Withdraw funds by tracking ID
+$("withdrawForm").addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const trackingId = $("wdTrackingId").value;
+    const amount = Number($("wdAmount").value);
+    const note = $("wdNote").value.trim();
+
+    try {
+
+        setMsg("wdMsg", "Withdrawing...", true);
+
+        const result = await withdrawByTrackingId(trackingId, amount, note);
+
+        setMsg("wdMsg",
+            `Withdrew ${money(amount)} from ${result.name || trackingId}. New balance: ${money(result.balance)}.`,
+            true);
+        e.target.reset();
+        loadCustomers();
+
+    } catch (error) {
+
+        console.error(error);
+        setMsg("wdMsg", error.message, false);
 
     }
 

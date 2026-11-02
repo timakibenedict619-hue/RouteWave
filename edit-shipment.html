@@ -4,289 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RouteWave • Edit Shipment</title>
-
-<link rel="stylesheet" href="admin.css">
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter', system-ui, sans-serif;
-}
-
-body{
-background:#0A0A0F;
-color:#E5E7EB;
-min-height:100vh;
-padding:40px;
-}
-
-.container{
-max-width:1000px;
-margin:auto;
-background:#1F2937;
-padding:50px;
-border-radius:24px;
-box-shadow:0 20px 60px rgba(0,0,0,0.5);
-border:1px solid #374151;
-}
-
-h1{
-color:#F3F4F6;
-margin-bottom:40px;
-text-align:center;
-font-size:32px;
-font-weight:700;
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:24px;
-margin-bottom:24px;
-}
-
-.form-group{
-display:flex;
-flex-direction:column;
-}
-
-label{
-margin-bottom:10px;
-font-weight:600;
-color:#9CA3AF;
-font-size:15px;
-}
-
-input,
-select,
-textarea{
-width:100%;
-padding:16px 20px;
-background:#111827;
-border:1px solid #374151;
-border-radius:14px;
-font-size:16px;
-color:#fff;
-outline:none;
-transition:0.3s;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-border-color:#8A2BE2;
-box-shadow:0 0 0 3px rgba(138,43,226,0.2);
-}
-
-textarea{
-min-height:140px;
-resize:vertical;
-}
-
-.buttons{
-display:flex;
-gap:16px;
-margin-top:40px;
-}
-
-button,
-a{
-padding:16px 28px;
-border:none;
-border-radius:14px;
-cursor:pointer;
-font-size:16px;
-font-weight:600;
-text-decoration:none;
-transition:0.4s;
-}
-
-.save{
-background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
-color:white;
-}
-
-.cancel{
-background:#374151;
-color:#E5E7EB;
-}
-
-@media(max-width:768px){
-.row{
-grid-template-columns:1fr;
-}
-.buttons{
-flex-direction:column;
-}
-}
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 
 </head>
-
 <body>
 
-<div class="container">
+<div class="app">
 
-<h1>Edit Shipment</h1>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+      <div>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
 
-<form id="editShipmentForm">
+    <div>
+      <div class="nav-label">Overview</div>
+      <nav class="nav">
+        <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+        <a href="create-shipment.html"><i class="fa-solid fa-circle-plus"></i>Create Shipment</a>
+        <a href="manage-shipments.html" class="active"><i class="fa-solid fa-boxes-stacked"></i>Manage Shipments</a>
+      </nav>
+    </div>
 
-<div class="row">
+    <div>
+      <div class="nav-label">Customers</div>
+      <nav class="nav">
+        <a href="admin-customers.html"><i class="fa-solid fa-wallet"></i>Customers & Funding</a>
+        <a href="tracking.html"><i class="fa-solid fa-location-dot"></i>Tracking</a>
+      </nav>
+    </div>
 
-<div class="form-group">
-<label>Customer Tracking ID</label>
-<input type="text" id="trackingId" list="trackingIdList" placeholder="Type or choose, e.g. TRK1730000000000123456" autocomplete="off" required>
-<datalist id="trackingIdList"></datalist>
-</div>
+    <div>
+      <div class="nav-label">System</div>
+      <nav class="nav">
+        <a href="admin-settings.html"><i class="fa-solid fa-gear"></i>Settings</a>
+      </nav>
+    </div>
 
-<div class="form-group">
-<label>Status</label>
-<select id="status">
-<option>Pending</option>
-<option>Processing</option>
-<option>Picked Up</option>
-<option>In Transit</option>
-<option>Arrived at Hub</option>
-<option>Customs Clearance</option>
-<option>Out For Delivery</option>
-<option>Delivered</option>
-<option>Cancelled</option>
+    <div class="sidebar-foot">
+      <div style="color:#64748B;margin-bottom:4px">Signed in as</div>
+      <div class="who" id="adminEmail">-</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-head">
+      <div>
+        <h1>Edit Shipment</h1>
+        <p>Update status, move to another customer, and manage photos and items.</p>
+      </div>
+      <div class="head-actions">
+        <a class="btn btn-ghost" href="manage-shipments.html"><i class="fa-solid fa-arrow-left"></i>Back to shipments</a>
+      </div>
+    </div>
+
+    <form id="editShipmentForm">
+
+    <div class="split">
+      <div class="card">
+        <h2>Customer & status</h2>
+        <p class="card-sub">Change the tracking ID to move this shipment to another customer.</p>
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="trackingId">Customer tracking ID</label>
+            <input type="text" id="trackingId" list="trackingIdList" placeholder="e.g. TRK1730000000000123456" autocomplete="off" required>
+            <datalist id="trackingIdList"></datalist>
+          </div>
+          <div class="field span-2">
+            <label for="status">Status</label>
+            <select id="status">
+<option value="Pending">Pending</option>
+<option value="In Transit">In Transit</option>
+<option value="Delivered">Delivered</option>
 </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Photos</h2>
+        <p class="card-sub">Remove a photo with ×, or add new ones below.</p>
+        <div id="photoList" class="photo-grid"></div>
+        <div class="field" style="margin-top:16px">
+          <label for="newPhotos">Add photos</label>
+          <input type="file" id="newPhotos" accept="image/*" multiple>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px">
+      <h2>Sender & receiver</h2>
+      <p class="card-sub">Who is sending the shipment, and who receives it.</p>
+      <div class="form-grid">
+        <div class="field"><label>sender name</label><input type="text" id="senderName" required></div><div class="field"><label>sender email</label><input type="email" id="senderEmail"></div><div class="field"><label>sender phone</label><input type="text" id="senderPhone"></div>
+        <div class="field"><label>receiver name</label><input type="text" id="receiverName" required></div><div class="field"><label>receiver email</label><input type="email" id="receiverEmail"></div><div class="field"><label>receiver phone</label><input type="text" id="receiverPhone"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Route & details</h2>
+      <p class="card-sub">Where it's going and what it contains.</p>
+      <div class="form-grid">
+        <div class="field"><label>Origin</label><input type="text" id="origin"></div>
+        <div class="field"><label>Destination</label><input type="text" id="destination"></div>
+        <div class="field"><label>Weight (kg)</label><input type="text" id="weight"></div>
+        <div class="field"><label>Carrier</label><input type="text" id="carrier"></div>
+        <div class="field"><label>Current location</label><input type="text" id="currentLocation"></div>
+        <div class="field"><label>Expected delivery</label><input type="date" id="expectedDelivery"></div>
+        <div class="field span-2"><label>Description / notes</label><textarea id="description"></textarea></div>
+        <div class="field span-2"><label>Important update (sent to the customer)</label><textarea id="importantUpdate" placeholder="Enter the latest update the customer should see..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+  <h2>Items / products</h2>
+  <p class="card-sub">What is inside this shipment. Shown to the customer.</p>
+  <div id="itemsEditor"></div>
+  <button type="button" id="addItemBtn" class="btn btn-ghost btn-sm"><i class="fa-solid fa-plus"></i>Add item</button>
 </div>
 
-</div>
+    <button class="btn btn-block" type="submit" style="margin-top:22px;height:50px"><i class="fa-solid fa-floppy-disk"></i>Save changes</button>
 
-<div class="row">
+    </form>
 
-<div class="form-group">
-<label>Sender Name</label>
-<input type="text" id="senderName">
-</div>
 
-<div class="form-group">
-<label>Receiver Name</label>
-<input type="text" id="receiverName">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Sender Email</label>
-<input type="email" id="senderEmail">
-</div>
-
-<div class="form-group">
-<label>Receiver Email</label>
-<input type="email" id="receiverEmail">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Sender Phone</label>
-<input type="text" id="senderPhone">
-</div>
-
-<div class="form-group">
-<label>Receiver Phone</label>
-<input type="text" id="receiverPhone">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Origin</label>
-<input type="text" id="origin">
-</div>
-
-<div class="form-group">
-<label>Destination</label>
-<input type="text" id="destination">
-</div>
+  </main>
 
 </div>
 
-<div class="row">
-
-<div class="form-group">
-<label>Carrier</label>
-<input type="text" id="carrier">
-</div>
-
-<div class="form-group">
-<label>Weight</label>
-<input type="text" id="weight">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Current Location</label>
-<input type="text" id="currentLocation">
-</div>
-
-<div class="form-group">
-<label>Expected Delivery</label>
-<input type="date" id="expectedDelivery">
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Description / Notes</label>
-<textarea id="description"></textarea>
-</div>
-  
-<div class="form-group">
-<label>Important Update</label>
-<textarea id="importantUpdate" placeholder="Enter the latest shipment update..."></textarea>
-</div>
-  
-<div class="buttons">
-<div class="row">
-
-<div class="form-group">
-<label>Add Photos</label>
-<input type="file" id="newPhotos" accept="image/*" multiple>
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Current Photos (click × to remove)</label>
-<div id="photoList" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
-</div>
-
-<div class="form-group">
-<label>Items / Products in this shipment</label>
-<div id="itemsEditor"></div>
-<button type="button" id="addItemBtn" style="width:auto;padding:12px 18px;margin-top:4px">+ Add item</button>
-</div>
-
-<button class="save" type="submit">
-Save Changes
-</button>
-
-<a href="manage-shipments.html" class="cancel">
-Cancel
-</a>
-</div>
-
-</form>
-
-</div>
-
+<script type="module" src="auth.js"></script>
 <script type="module" src="edit-shipment.js"></script>
 
 </body>
-  </html>
+</html>

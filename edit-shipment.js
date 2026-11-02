@@ -163,6 +163,7 @@ form.addEventListener("submit", async (e) => {
         const currentLocation = $("currentLocation").value;
 
         const historyItem = {
+            at: Date.now(),
             status: status,
             location: currentLocation,
             date: new Date().toLocaleDateString(),

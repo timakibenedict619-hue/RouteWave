@@ -12,7 +12,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -27,11 +26,15 @@ const esc = (value) =>
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[c]));
 
-// Firestore timestamp → seconds (works for missing values)
+// Firestore timestamp → seconds (0 when missing)
 const secs = (ts) => ts?.seconds || 0;
 
 const when = (ts) =>
   ts?.toDate ? ts.toDate().toLocaleString() : "";
+
+// Time of a tracking history entry, in ms
+const historyTime = (h) =>
+  h.at || Date.parse(`${h.date || ""} ${h.time || ""}`) || 0;
 
 let unsubscribers = [];
 let shipmentsStarted = false;
@@ -53,7 +56,7 @@ onAuthStateChanged(auth, (user) => {
   unsubscribers = [];
   shipmentsStarted = false;
 
-  // Customer profile + balance (updates when admin funds the account)
+  // Profile + balance (updates when admin funds or withdraws)
   unsubscribers.push(onSnapshot(doc(db, "users", user.uid), (snap) => {
 
     if (!snap.exists()) {
@@ -67,7 +70,6 @@ onAuthStateChanged(auth, (user) => {
     $("myTrackingId").textContent = me.trackingId;
     $("myBalance").textContent = money(me.balance);
 
-    // Start shipments once we know the tracking ID
     if (!shipmentsStarted && me.trackingId) {
       shipmentsStarted = true;
       listenToShipments(me.trackingId);
@@ -75,15 +77,9 @@ onAuthStateChanged(auth, (user) => {
 
   }));
 
-  // Funding history (updates when admin adds funds)
-  unsubscribers.push(onSnapshot(
-    query(collection(db, "users", user.uid, "transactions"), orderBy("createdAt", "desc")),
-    (snap) => renderTransactions(snap.docs.map((d) => d.data()))
-  ));
-
 });
 
-// Shipments, items, descriptions, updates (updates when admin adds or edits)
+// Shipments (updates live when admin adds or edits)
 function listenToShipments(trackingId) {
 
   unsubscribers.push(onSnapshot(
@@ -101,17 +97,18 @@ function listenToShipments(trackingId) {
 
       renderMessages(shipments);
       renderShipments(shipments);
+      renderHistory(shipments);
 
     },
     (error) => {
       console.error(error);
-      $("shipmentGrid").innerHTML = `<p class="muted">Could not load shipments.</p>`;
+      $("shipmentGrid").innerHTML = `<p class="empty">Could not load shipments.</p>`;
     }
   ));
 
 }
 
-// Messages: important updates from the admin, newest first
+// Messages: important updates from RouteWave, newest first
 function renderMessages(shipments) {
 
   const messages = shipments
@@ -127,27 +124,28 @@ function renderMessages(shipments) {
 
   $("messageList").innerHTML = messages.length
     ? messages.map((m) => `
-        <div class="row" style="display:block">
-          <div class="muted">${esc(m.trackingId)} · ${esc(m.when)}</div>
-          <div class="update" style="margin-top:6px">${esc(m.text)}</div>
+        <div class="list-row" style="display:block">
+          <div class="muted" style="font-size:13px">${esc(m.trackingId)} · ${esc(m.when)}</div>
+          <div class="note" style="margin-top:8px">${esc(m.text)}</div>
         </div>`).join("")
-    : `<p class="muted">No messages yet.</p>`;
+    : `<p class="empty">No messages yet.</p>`;
 
 }
 
+// Shipment cards: details, description, items, photos
 function renderShipments(shipments) {
 
   const grid = $("shipmentGrid");
 
   if (shipments.length === 0) {
-    grid.innerHTML = `<p class="muted">No shipments yet.</p>`;
+    grid.innerHTML = `<div class="card"><p class="empty">No shipments yet.</p></div>`;
     return;
   }
 
   grid.innerHTML = shipments.map((s) => {
 
     const items = (s.items || []).length
-      ? `<table class="items">
+      ? `<div class="table-wrap"><table class="items-table">
            <thead><tr><th>Item</th><th>Qty</th><th>Notes</th></tr></thead>
            <tbody>${s.items.map((i) => `
              <tr>
@@ -156,57 +154,81 @@ function renderShipments(shipments) {
                <td>${esc(i.notes || "-")}</td>
              </tr>`).join("")}
            </tbody>
-         </table>`
+         </table></div>`
       : `<p class="muted">No items listed.</p>`;
 
-    const history = (s.trackingHistory || []).slice().reverse().map((h) => `
-        <li>
-          <strong>${esc(h.status)}</strong> · ${esc(h.location || "-")}
-          <span class="muted">${esc(h.date || "")} ${esc(h.time || "")}</span>
-        </li>`).join("");
-
-    const photos = (s.photos || []).map((url) =>
-      `<img src="${esc(url)}" alt="Shipment photo" loading="lazy">`
-    ).join("");
+    const photos = (s.photos || []).length
+      ? `<div class="photo-grid">${s.photos.map((url) =>
+          `<img src="${esc(url)}" alt="Shipment photo" loading="lazy">`).join("")}</div>`
+      : "";
 
     return `
-      <div class="card wide">
-        <div class="card-head">
-          <strong>${esc(s.trackingId)}</strong>
+      <div class="card shipment-card">
+        <div class="shipment-head">
+          <div>
+            <div class="id">${esc(s.trackingId)}</div>
+            <div class="muted" style="font-size:13px">${esc(s.carrier || "")}</div>
+          </div>
           <span class="badge">${esc(s.status || "-")}</span>
         </div>
 
-        <p>${esc(s.origin || "-")} → ${esc(s.destination || "-")}</p>
-        <p class="muted">Current location: ${esc(s.currentLocation || "-")}</p>
-        <p class="muted">Expected delivery: ${esc(s.expectedDelivery || "-")}</p>
-        <p class="muted">Carrier: ${esc(s.carrier || "-")} · Weight: ${esc(s.weight || "-")}</p>
+        <div class="route">
+          <span>${esc(s.origin || "-")}</span><i class="fa-solid fa-arrow-right"></i><span>${esc(s.destination || "-")}</span>
+        </div>
 
-        ${s.description ? `<p class="desc">${esc(s.description)}</p>` : ""}
-        ${s.importantUpdate ? `<p class="update">${esc(s.importantUpdate)}</p>` : ""}
+        <div class="meta-grid">
+          <div><div class="k">Current location</div><div class="v">${esc(s.currentLocation || "-")}</div></div>
+          <div><div class="k">Expected delivery</div><div class="v">${esc(s.expectedDelivery || "-")}</div></div>
+          <div><div class="k">Weight</div><div class="v">${esc(s.weight || "-")}</div></div>
+        </div>
 
-        <h4 class="sub-title">Items</h4>
-        ${items}
+        ${s.description ? `<p>${esc(s.description)}</p>` : ""}
+        ${s.importantUpdate ? `<div class="note gold"><strong>Update:</strong> ${esc(s.importantUpdate)}</div>` : ""}
 
-        ${photos ? `<h4 class="sub-title">Photos</h4><div class="photos">${photos}</div>` : ""}
+        <div>
+          <div class="k" style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Items</div>
+          ${items}
+        </div>
 
-        ${history ? `<h4 class="sub-title">Tracking history</h4><ul class="timeline">${history}</ul>` : ""}
+        ${photos ? `<div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Photos</div>${photos}</div>` : ""}
       </div>`;
 
   }).join("");
 
 }
 
-function renderTransactions(transactions) {
+// Tracking history, shown last on the page, one block per shipment
+function renderHistory(shipments) {
 
-  $("transactionList").innerHTML = transactions.length
-    ? transactions.map((t) => `
-        <div class="row">
+  const withHistory = shipments.filter((s) => (s.trackingHistory || []).length);
+
+  if (withHistory.length === 0) {
+    $("historyList").innerHTML = `<div class="card"><p class="empty">No tracking history yet.</p></div>`;
+    return;
+  }
+
+  $("historyList").innerHTML = withHistory.map((s) => {
+
+    const entries = [...s.trackingHistory]
+      .sort((a, b) => historyTime(b) - historyTime(a))
+      .map((h) => `
+        <li>
+          <div class="t-title">${esc(h.status || "-")}</div>
+          <div class="t-meta">${esc(h.location || "-")} · ${esc(h.date || "")} ${esc(h.time || "")}</div>
+        </li>`).join("");
+
+    return `
+      <div class="card">
+        <div class="shipment-head" style="margin-bottom:14px">
           <div>
-            <strong>+${money(t.amount)}</strong>
-            <span class="muted"> · ${esc(t.note || "Funding")}</span>
+            <div class="id">${esc(s.trackingId)}</div>
+            <div class="muted" style="font-size:13px">${esc(s.origin || "-")} → ${esc(s.destination || "-")}</div>
           </div>
-          <span class="muted">${esc(when(t.createdAt))}</span>
-        </div>`).join("")
-    : `<p class="muted">No transactions yet.</p>`;
+          <span class="badge">${esc(s.status || "-")}</span>
+        </div>
+        <ul class="timeline">${entries}</ul>
+      </div>`;
+
+  }).join("");
 
 }

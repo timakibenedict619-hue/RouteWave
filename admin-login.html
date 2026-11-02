@@ -3,313 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>RouteWave | Admin Login</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
-
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-overflow:hidden;
-}
-
-.background{
-position:absolute;
-width:100%;
-height:100%;
-overflow:hidden;
-}
-
-.background span{
-position:absolute;
-display:block;
-width:120px;
-height:120px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-animation:float 18s linear infinite;
-}
-
-.background span:nth-child(1){
-left:10%;
-top:20%;
-animation-duration:18s;
-}
-
-.background span:nth-child(2){
-left:70%;
-top:15%;
-animation-duration:22s;
-width:180px;
-height:180px;
-}
-
-.background span:nth-child(3){
-left:80%;
-top:70%;
-animation-duration:16s;
-}
-
-.background span:nth-child(4){
-left:20%;
-top:80%;
-animation-duration:25s;
-width:150px;
-height:150px;
-}
-
-@keyframes float{
-
-0%{
-transform:translateY(0) rotate(0deg);
-}
-
-50%{
-transform:translateY(-60px) rotate(180deg);
-}
-
-100%{
-transform:translateY(0) rotate(360deg);
-}
-
-}
-
-.card{
-
-position:relative;
-
-z-index:10;
-
-width:420px;
-
-background:white;
-
-border-radius:20px;
-
-padding:40px;
-
-box-shadow:0 25px 60px rgba(0,0,0,.35);
-
-}
-
-.logo{
-
-width:80px;
-
-height:80px;
-
-margin:auto;
-
-background:#2563eb;
-
-border-radius:50%;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-font-size:40px;
-
-color:white;
-
-margin-bottom:20px;
-
-}
-
-h1{
-
-text-align:center;
-
-font-size:30px;
-
-margin-bottom:5px;
-
-color:#111827;
-
-}
-
-.subtitle{
-
-text-align:center;
-
-color:#6b7280;
-
-margin-bottom:35px;
-
-}
-
-label{
-
-display:block;
-
-margin-bottom:8px;
-
-font-weight:bold;
-
-color:#374151;
-
-}
-
-input{
-
-width:100%;
-
-padding:15px;
-
-border:1px solid #d1d5db;
-
-border-radius:10px;
-
-margin-bottom:20px;
-
-font-size:16px;
-
-transition:.3s;
-
-}
-
-input:focus{
-
-outline:none;
-
-border-color:#2563eb;
-
-box-shadow:0 0 10px rgba(37,99,235,.25);
-
-}
-
-button{
-
-width:100%;
-
-padding:15px;
-
-background:#2563eb;
-
-color:white;
-
-font-size:17px;
-
-font-weight:bold;
-
-border:none;
-
-border-radius:10px;
-
-cursor:pointer;
-
-transition:.3s;
-
-}
-
-button:hover{
-
-background:#1d4ed8;
-
-transform:translateY(-2px);
-
-}
-
-#error{
-
-margin-top:18px;
-
-text-align:center;
-
-color:red;
-
-font-size:15px;
-
-}
-
-.footer{
-
-margin-top:30px;
-
-text-align:center;
-
-font-size:13px;
-
-color:#6b7280;
-
-}
-
-</style>
-
+<title>RouteWave • Admin Sign In</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 </head>
-
 <body>
 
-<div class="background">
+<div class="login-page">
 
-<span></span>
+  <section class="login-hero">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+      <div>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Admin console</div>
+      </div>
+    </div>
 
-<span></span>
+    <div>
+      <h2>Manage shipments, customers, and funds.</h2>
+      <p>Restricted to RouteWave administrators. Sign in with your admin email and password.</p>
+    </div>
 
-<span></span>
+    <div class="foot">© 2026 RouteWave. Authorised personnel only.</div>
+  </section>
 
-<span></span>
+  <section class="login-panel">
+    <div class="login-box">
 
-</div>
+      <h1>Admin sign in</h1>
+      <p class="sub">Enter your admin credentials to continue.</p>
 
-<div class="card">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="admin@routewave.com" autocomplete="email">
+      </div>
 
-<div class="logo">
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
 
-🚚
+      <button id="loginBtn" class="btn btn-block" style="margin-top:6px">Sign in</button>
 
-</div>
+      <p id="error" class="msg err" style="text-align:center"></p>
 
-<h1>Transithive</h1>
+      <div class="alt">Are you a customer? <a href="customer-login.html">Customer sign in</a></div>
 
-<p class="subtitle">
-
-Administrator Portal
-
-</p>
-
-<label>Email Address</label>
-
-<input
-type="email"
-id="email"
-placeholder="Enter admin email">
-
-<label>Password</label>
-
-<input
-type="password"
-id="password"
-placeholder="Enter password">
-
-<button id="loginBtn">
-
-Login
-
-</button>
-
-<p id="error"></p>
-
-<div class="footer">
-
-© 2026 RouteWave. All Rights Reserved.
-
-</div>
+    </div>
+  </section>
 
 </div>
 

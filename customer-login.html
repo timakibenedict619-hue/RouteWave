@@ -4,38 +4,60 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RouteWave • Customer Login</title>
-<link rel="stylesheet" href="customer.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 
-<div class="login-wrap">
-  <div class="login-card">
+<div class="login-page">
 
-    <a href="index.html" class="muted" style="display:inline-block;margin-bottom:20px;">← Back to website</a>
-
-    <h1>Customer Login</h1>
-    <p class="muted sub">Sign in with your tracking ID and email</p>
-
-    <div class="field">
-      <label for="trackingId">Tracking ID</label>
-      <input type="text" id="trackingId" placeholder="e.g. CUS12345678" autocomplete="off">
+  <section class="login-hero">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+      <div>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Global logistics</div>
+      </div>
     </div>
 
-    <div class="field">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com">
+    <div>
+      <h2>Your shipments and balance, in one place.</h2>
+      <p>Sign in with your tracking ID to see your shipments, updates, photos, and account balance.</p>
     </div>
 
-    <div class="field">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="••••••••">
+    <div class="foot">© 2026 RouteWave. All rights reserved.</div>
+  </section>
+
+  <section class="login-panel">
+    <div class="login-box">
+
+      <h1>Customer sign in</h1>
+      <p class="sub">Use the tracking ID your account was created with.</p>
+
+      <div class="field">
+        <label for="trackingId">Tracking ID</label>
+        <input type="text" id="trackingId" placeholder="e.g. TRK1730000000000123456" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <button id="loginBtn" class="btn btn-block" style="margin-top:6px">Sign in</button>
+
+      <p id="error" class="msg err" style="text-align:center"></p>
+
+      <div class="alt">Are you an admin? <a href="admin-login.html">Admin sign in</a></div>
+
     </div>
+  </section>
 
-    <button id="loginBtn" class="btn" style="width:100%;margin-top:8px;">Login</button>
-
-    <p id="error" class="error"></p>
-
-  </div>
 </div>
 
 <script type="module" src="customer-login.js"></script>

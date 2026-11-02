@@ -4,50 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RouteWave • My Dashboard</title>
-<link rel="stylesheet" href="customer.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 
-<div class="topbar">
-  <div>
-    <h1>Welcome, <span id="welcomeName">...</span></h1>
-    <p class="muted">Tracking ID: <code id="myTrackingId" style="color:#00D9FF;">-</code></p>
-  </div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;">
-    <a href="tracking.html" class="btn btn-outline" style="display:inline-block;">Track a Shipment</a>
-    <button id="logoutBtn" class="btn">Logout</button>
-  </div>
-</div>
-
-<div class="wrap">
-
-  <div class="summary">
-    <div class="tile">
-      <h3>Available Balance</h3>
-      <div class="big" id="myBalance">$0.00</div>
+<header class="site-top">
+  <div class="brand">
+    <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+    <div>
+      <div class="brand-name">RouteWave</div>
+      <div class="muted">Customer portal</div>
     </div>
-    <div class="tile">
-      <h3>My Shipments</h3>
-      <div class="big" id="shipmentCount">0</div>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="tracking.html" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
+      <i class="fa-solid fa-location-dot"></i>Track a shipment
+    </a>
+    <button id="logoutBtn" class="btn btn-ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
+      <i class="fa-solid fa-right-from-bracket"></i>Logout
+    </button>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="split" style="margin-bottom:8px">
+    <div class="hero-balance">
+      <div class="label">Available balance</div>
+      <div class="amount" id="myBalance">$0.00</div>
+      <div class="meta">Welcome back, <strong id="welcomeName">...</strong></div>
+    </div>
+
+    <div class="card stat" style="align-items:flex-start;flex-direction:column;justify-content:center">
+      <div class="stat-label">Your tracking ID</div>
+      <div class="stat-value" style="font-size:22px;margin:8px 0 14px"><code id="myTrackingId">-</code></div>
+      <div class="stat-label">Shipments on your account</div>
+      <div class="stat-value" id="shipmentCount">0</div>
     </div>
   </div>
 
   <h2 class="section-title">Messages from RouteWave</h2>
-  <div class="list" id="messageList">
-    <p class="muted">Loading...</p>
+  <div class="card" id="messageList">
+    <p class="empty">Loading...</p>
   </div>
 
-  <h2 class="section-title">My Shipments</h2>
-  <div class="grid" id="shipmentGrid">
-    <p class="muted">Loading...</p>
+  <h2 class="section-title">My shipments</h2>
+  <div id="shipmentGrid" class="stack">
+    <p class="empty">Loading...</p>
   </div>
 
-  <h2 class="section-title">Funds & Transactions</h2>
-  <div class="list" id="transactionList">
-    <p class="muted">Loading...</p>
+  <h2 class="section-title">Tracking history</h2>
+  <div id="historyList" class="stack">
+    <p class="empty">Loading...</p>
   </div>
 
-</div>
+</main>
 
 <script type="module" src="my-dashboard.js"></script>
 

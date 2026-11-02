@@ -3,264 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Track Shipment - RouteWave</title>
-
-<link rel="stylesheet" href="style.css">
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter', system-ui, sans-serif;
-}
-
-body{
-background:#0F0F1A;
-color:#fff;
-}
-
-header{
-background:linear-gradient(135deg, #8A2BE2 0%, #6A1B9A 100%);
-color:#fff;
-padding:30px 20px;
-text-align:center;
-}
-
-.container{
-max-width:1000px;
-margin:40px auto;
-padding:20px;
-}
-
-.search-box{
-display:flex;
-gap:12px;
-margin-bottom:30px;
-}
-
-.search-box input{
-flex:1;
-padding:18px;
-font-size:17px;
-background:#1A1A2E;
-border:1px solid #8A2BE2;
-border-radius:12px;
-color:#fff;
-outline:none;
-}
-
-.search-box button{
-padding:18px 32px;
-background:linear-gradient(135deg, #8A2BE2 0%, #00D9FF 100%);
-color:#fff;
-border:none;
-border-radius:12px;
-cursor:pointer;
-font-weight:600;
-}
-
-.card{
-display:none;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(12px);
-padding:30px;
-border-radius:16px;
-border:1px solid rgba(255,255,255,0.1);
-margin-bottom:25px;
-}
-
-.card h2{
-color:#00D9FF;
-margin-bottom:25px;
-font-size:1.8rem;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:20px;
-}
-
-.item{
-margin-bottom:15px;
-}
-
-.item label{
-display:block;
-font-size:14px;
-color:#aaa;
-margin-bottom:6px;
-}
-
-.item span{
-font-weight:600;
-font-size:16px;
-color:#fff;
-}
-
-.progress{
-margin:30px 0;
-}
-
-.progress-bar{
-height:18px;
-background:#1A1A2E;
-border-radius:20px;
-overflow:hidden;
-border:1px solid #8A2BE2;
-}
-
-.progress-fill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg, #8A2BE2, #00D9FF);
-transition:.4s;
-}
-
-.timeline{
-list-style:none;
-border-left:4px solid #8A2BE2;
-padding-left:25px;
-margin-top:20px;
-}
-
-.timeline li{
-margin-bottom:25px;
-position:relative;
-}
-
-.timeline li::before{
-content:"";
-position:absolute;
-left:-28px;
-top:6px;
-width:16px;
-height:16px;
-background:#00D9FF;
-border:3px solid #0F0F1A;
-border-radius:50%;
-}
-
-.status{
-display:inline-block;
-padding:8px 22px;
-background:#4CAF50;
-color:#fff;
-border-radius:30px;
-font-weight:500;
-}
-
-.not-found{
-display:none;
-background:#ffebee;
-color:#c62828;
-padding:25px;
-border-radius:12px;
-text-align:center;
-margin:20px 0;
-}
-
-footer{
-text-align:center;
-padding:30px;
-color:#777;
-margin-top:60px;
-font-size:0.95rem;
-}
-</style>
-
+<title>RouteWave • Track Shipment</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 </head>
-
 <body>
 
-<header>
-<h1>Shipment Tracking</h1>
-<p>Real-time tracking • Route wave</p>
+<header class="site-top">
+  <a href="index.html" class="brand">
+    <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+    <div>
+      <div class="brand-name">RouteWave</div>
+      <div class="muted">Global logistics</div>
+    </div>
+  </a>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="customer-login.html" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
+      <i class="fa-solid fa-user"></i>Customer login
+    </a>
+  </div>
 </header>
 
-<div class="container">
+<section class="track-hero">
+  <h1>Track your shipment</h1>
+  <p>Enter your tracking ID to see the latest status, location, and updates.</p>
 
-<div class="search-box">
-<input
-type="text"
-id="trackingInput"
-placeholder="Enter Tracking Number (e.g. ST-3928471)">
+  <div class="track-search">
+    <input type="text" id="trackingInput" placeholder="e.g. TRK1730000000000123456" autocomplete="off">
+    <button id="trackBtn" class="btn"><i class="fa-solid fa-magnifying-glass"></i>Track</button>
+  </div>
+</section>
 
-<button id="trackBtn">
-Track Shipment
-</button>
-</div>
+<main class="track-body">
 
-<div class="not-found" id="notFound">
-Shipment not found. Please check your tracking number.
-</div>
+  <div id="notFound" class="card" style="display:none;text-align:center;margin-bottom:20px"></div>
 
-<div class="card" id="resultCard">
-<h2>Shipment Information</h2>
+  <div id="resultCard" class="card" style="display:none">
 
-<div class="grid">
-<div class="item">
-<label>Tracking ID</label>
-<span id="trackingId"></span>
-</div>
+    <div class="shipment-head" style="margin-bottom:18px">
+      <div>
+        <div class="muted" style="font-size:13px">Tracking ID</div>
+        <div class="id" id="trackingId" style="font-size:20px">-</div>
+      </div>
+      <span class="badge" id="status">-</span>
+    </div>
 
-<div class="item">
-<label>Status</label>
-<span class="status" id="status"></span>
-</div>
+    <div class="progress"><span id="progressFill"></span></div>
+    <div class="route" style="margin:14px 0 22px">
+      <span id="origin">-</span><i class="fa-solid fa-arrow-right"></i><span id="destination">-</span>
+    </div>
 
-<div class="item">
-<label>Origin</label>
-<span id="origin"></span>
-</div>
+    <div class="info-grid" style="margin-bottom:22px">
+      <div class="info-item"><label>Current location</label><span id="currentLocation">-</span></div>
+      <div class="info-item"><label>Expected delivery</label><span id="expectedDelivery">-</span></div>
+      <div class="info-item"><label>Carrier</label><span id="carrier">-</span></div>
+      <div class="info-item"><label>Weight</label><span id="weight">-</span></div>
+    </div>
 
-<div class="item">
-<label>Destination</label>
-<span id="destination"></span>
-</div>
+    <div class="section-divider"></div>
 
-<div class="item">
-<label>Current Location</label>
-<span id="currentLocation"></span>
-</div>
+    <h2 style="margin-bottom:14px">History</h2>
+    <ul class="timeline" id="timeline">
+      <li>No tracking history available.</li>
+    </ul>
 
-<div class="item">
-<label>Expected Delivery</label>
-<span id="expectedDelivery"></span>
-</div>
+  </div>
 
-<div class="item">
-<label>Carrier</label>
-<span id="carrier"></span>
-</div>
-
-<div class="item">
-<label>Weight</label>
-<span id="weight"></span>
-</div>
-</div>
-
-<div class="progress">
-<h3>Delivery Progress</h3>
-<br>
-<div class="progress-bar">
-<div class="progress-fill" id="progressFill"></div>
-</div>
-</div>
-
-<h2>Tracking History</h2>
-<ul class="timeline" id="timeline"></ul>
-</div>
-
-</div>
-
-<footer>
-© 2026 RouteWave • All Rights Reserved
-</footer>
+</main>
 
 <script type="module" src="tracking.js"></script>
 
 </body>
-  </html>
+</html>

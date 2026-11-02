@@ -4,270 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RouteWave • Create Shipment</title>
-
-<link rel="stylesheet" href="admin.css">
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter', system-ui, sans-serif;
-}
-
-body{
-background:#0A0A0F;
-color:#E5E7EB;
-min-height:100vh;
-padding:40px;
-}
-
-.container{
-max-width:1000px;
-margin:auto;
-background:#1F2937;
-padding:50px;
-border-radius:24px;
-box-shadow:0 20px 60px rgba(0,0,0,0.5);
-border:1px solid #374151;
-}
-
-h2{
-margin-bottom:40px;
-color:#F3F4F6;
-text-align:center;
-font-size:32px;
-font-weight:700;
-}
-
-.form-group{
-margin-bottom:24px;
-}
-
-label{
-display:block;
-margin-bottom:8px;
-font-weight:600;
-color:#9CA3AF;
-font-size:15px;
-}
-
-input,
-select,
-textarea{
-width:100%;
-padding:16px 20px;
-background:#111827;
-border:1px solid #374151;
-border-radius:14px;
-font-size:16px;
-color:#fff;
-outline:none;
-transition:0.3s;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-border-color:#8A2BE2;
-box-shadow:0 0 0 3px rgba(138,43,226,0.2);
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:24px;
-}
-
-.back{
-display:inline-flex;
-align-items:center;
-gap:8px;
-margin-bottom:30px;
-color:#9CA3AF;
-text-decoration:none;
-font-weight:500;
-}
-
-.back:hover{
-color:#00D9FF;
-}
-
-button{
-width:100%;
-padding:18px;
-background:linear-gradient(135deg,#8A2BE2,#6A1B9A);
-color:white;
-border:none;
-border-radius:16px;
-font-size:17px;
-font-weight:600;
-cursor:pointer;
-margin-top:20px;
-transition:all 0.4s ease;
-}
-
-button:hover{
-transform:translateY(-3px);
-box-shadow:0 15px 30px rgba(138,43,226,0.4);
-}
-
-@media(max-width:768px){
-.row{
-grid-template-columns:1fr;
-}
-}
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
 
 </head>
-
 <body>
 
-<div class="container">
+<div class="app">
 
-<a href="dashboard.html" class="back">← Back to Dashboard</a>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+      <div>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
 
-<h2>Create New Shipment</h2>
+    <div>
+      <div class="nav-label">Overview</div>
+      <nav class="nav">
+        <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+        <a href="create-shipment.html" class="active"><i class="fa-solid fa-circle-plus"></i>Create Shipment</a>
+        <a href="manage-shipments.html"><i class="fa-solid fa-boxes-stacked"></i>Manage Shipments</a>
+      </nav>
+    </div>
 
-<form id="shipmentForm">
+    <div>
+      <div class="nav-label">Customers</div>
+      <nav class="nav">
+        <a href="admin-customers.html"><i class="fa-solid fa-wallet"></i>Customers & Funding</a>
+        <a href="tracking.html"><i class="fa-solid fa-location-dot"></i>Tracking</a>
+      </nav>
+    </div>
 
-<div class="row">
+    <div>
+      <div class="nav-label">System</div>
+      <nav class="nav">
+        <a href="admin-settings.html"><i class="fa-solid fa-gear"></i>Settings</a>
+      </nav>
+    </div>
 
-<div class="form-group">
-<label>Customer Tracking ID</label>
-<input type="text" id="trackingId" list="trackingIdList" placeholder="Type or choose, e.g. TRK1730000000000123456" autocomplete="off" required>
-<datalist id="trackingIdList"></datalist>
-</div>
+    <div class="sidebar-foot">
+      <div style="color:#64748B;margin-bottom:4px">Signed in as</div>
+      <div class="who" id="adminEmail">-</div>
+    </div>
+  </aside>
 
-<div class="form-group">
-<label>Status</label>
-<select id="status">
+  <main class="main">
+
+    <div class="page-head">
+      <div>
+        <h1>Create Shipment</h1>
+        <p>Assign a shipment to a customer, add photos and items, and publish it.</p>
+      </div>
+      <div class="head-actions">
+        <a class="btn btn-ghost" href="manage-shipments.html"><i class="fa-solid fa-arrow-left"></i>Back to shipments</a>
+      </div>
+    </div>
+
+    <form id="shipmentForm">
+
+    <div class="split">
+      <div class="card">
+        <h2>Customer & status</h2>
+        <p class="card-sub">Choose the customer's tracking ID. Type it, or pick it from the list.</p>
+        <div class="form-grid">
+          <div class="field span-2">
+            <label for="trackingId">Customer tracking ID</label>
+            <input type="text" id="trackingId" list="trackingIdList" placeholder="e.g. TRK1730000000000123456" autocomplete="off" required>
+            <datalist id="trackingIdList"></datalist>
+          </div>
+          <div class="field span-2">
+            <label for="status">Status</label>
+            <select id="status">
 <option value="Pending">Pending</option>
 <option value="In Transit">In Transit</option>
 <option value="Delivered">Delivered</option>
 </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Photos</h2>
+        <p class="card-sub">Upload photos of the shipment. They are stored on Cloudinary.</p>
+        <div class="field">
+          <input type="file" id="photos" accept="image/*" multiple>
+        </div>
+        <div id="photoPreview" class="photo-grid"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px">
+      <h2>Sender & receiver</h2>
+      <p class="card-sub">Who is sending the shipment, and who receives it.</p>
+      <div class="form-grid">
+        
+        <div class="field"><label>sender name</label><input type="text" id="senderName" required></div><div class="field"><label>sender email</label><input type="email" id="senderEmail"></div><div class="field"><label>sender phone</label><input type="text" id="senderPhone"></div>
+        <div class="field"><label>receiver name</label><input type="text" id="receiverName" required></div><div class="field"><label>receiver email</label><input type="email" id="receiverEmail"></div><div class="field"><label>receiver phone</label><input type="text" id="receiverPhone"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Route & details</h2>
+      <p class="card-sub">Where it's going and what it contains.</p>
+      <div class="form-grid">
+        <div class="field"><label>Origin</label><input type="text" id="origin"></div>
+        <div class="field"><label>Destination</label><input type="text" id="destination"></div>
+        <div class="field"><label>Weight (kg)</label><input type="text" id="weight"></div>
+        <div class="field"><label>Carrier</label><input type="text" id="carrier"></div>
+        <div class="field"><label>Current location</label><input type="text" id="currentLocation"></div>
+        <div class="field"><label>Expected delivery</label><input type="date" id="expectedDelivery"></div>
+        <div class="field span-2"><label>Description / notes</label><textarea id="description"></textarea></div>
+        <div class="field span-2"><label>Important update (sent to the customer)</label><textarea id="importantUpdate" placeholder="Enter the latest update the customer should see..."></textarea></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px">
+  <h2>Items / products</h2>
+  <p class="card-sub">What is inside this shipment. Shown to the customer.</p>
+  <div id="itemsEditor"></div>
+  <button type="button" id="addItemBtn" class="btn btn-ghost btn-sm"><i class="fa-solid fa-plus"></i>Add item</button>
 </div>
 
-</div>
+    <button type="submit" class="btn btn-block" style="margin-top:22px;height:50px"><i class="fa-solid fa-floppy-disk"></i>Create & save shipment</button>
 
-<div class="row">
+    </form>
 
-<div class="form-group">
-<label>Sender Name</label>
-<input type="text" id="senderName" required>
-</div>
 
-<div class="form-group">
-<label>Sender Email</label>
-<input type="email" id="senderEmail">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Sender Phone</label>
-<input type="text" id="senderPhone">
-</div>
-
-<div class="form-group">
-<label>Receiver Name</label>
-<input type="text" id="receiverName" required>
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Receiver Email</label>
-<input type="email" id="receiverEmail">
-</div>
-
-<div class="form-group">
-<label>Receiver Phone</label>
-<input type="text" id="receiverPhone">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Origin</label>
-<input type="text" id="origin">
-</div>
-
-<div class="form-group">
-<label>Destination</label>
-<input type="text" id="destination">
-</div>
+  </main>
 
 </div>
 
-<div class="row">
-
-<div class="form-group">
-<label>Weight (kg)</label>
-<input type="text" id="weight">
-</div>
-
-<div class="form-group">
-<label>Carrier</label>
-<input type="text" id="carrier">
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="form-group">
-<label>Current Location</label>
-<input type="text" id="currentLocation">
-</div>
-
-<div class="form-group">
-<label>Expected Delivery</label>
-<input type="date" id="expectedDelivery">
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Description / Notes</label>
-<textarea id="description" rows="4"></textarea>
-</div>
-  
-<div class="form-group">
-<label>Important Update</label>
-<textarea id="importantUpdate" rows="4" placeholder="Enter the latest shipment update..."></textarea>
-</div>
-  
-<div class="row">
-<div class="form-group">
-<label>Shipment Photos</label>
-<input type="file" id="photos" accept="image/*" multiple>
-</div>
-</div>
-
-<div id="photoPreview" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
-
-<div class="form-group">
-<label>Items / Products in this shipment</label>
-<div id="itemsEditor"></div>
-<button type="button" id="addItemBtn" style="width:auto;padding:12px 18px;margin-top:4px">+ Add item</button>
-</div>
-
-<button type="submit">
-Create & Save Shipment
-</button>
-
-</form>
-
-</div>
-
+<script type="module" src="auth.js"></script>
 <script type="module" src="create-shipment.js"></script>
 
 </body>
-  </html>
+</html>
