@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Customer Login</title>
+<link rel="stylesheet" href="customer.css">
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <a href="index.html" class="muted" style="display:inline-block;margin-bottom:20px;">← Back to website</a>
+
+    <h1>Customer Login</h1>
+    <p class="muted sub">Sign in with your tracking ID and email</p>
+
+    <div class="field">
+      <label for="trackingId">Tracking ID</label>
+      <input type="text" id="trackingId" placeholder="e.g. CUS12345678" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com">
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••">
+    </div>
+
+    <button id="loginBtn" class="btn" style="width:100%;margin-top:8px;">Login</button>
+
+    <p id="error" class="error"></p>
+
+  </div>
+</div>
+
+<script type="module" src="customer-login.js"></script>
+
+</body>
+</html>

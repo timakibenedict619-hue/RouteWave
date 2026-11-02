@@ -204,6 +204,9 @@
                 </div>
 
                 <div class="flex items-center gap-4">
+                    <a href="customer-login.html" title="Customer login" aria-label="Customer login" class="w-12 h-12 rounded-lg flex items-center justify-center border border-white/20 hover:bg-white/10 hover:text-[#00D9FF] transition">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
                     <a href="tracking.html" class="btn-primary px-6 py-3 rounded-lg font-semibold text-sm flex items-center gap-2">
     <i class="fa-solid fa-truck-fast"></i>
     <span class="hidden sm:inline">Track Shipment</span>
@@ -234,6 +237,7 @@
                 </button>
             </div>
             <nav class="space-y-1">
+                <a href="customer-login.html" class="block py-3 px-4 text-gray-800 font-medium hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition"><i class="fa-solid fa-user mr-2"></i>Customer Login</a>
                 <a href="#home" class="block py-3 px-4 text-gray-800 font-medium hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition mobile-link">Home</a>
                 <a href="#about" class="block py-3 px-4 text-gray-800 font-medium hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition mobile-link">About</a>
                 <a href="#services" class="block py-3 px-4 text-gray-800 font-medium hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition mobile-link">Services</a>
@@ -971,6 +975,6 @@
             });
         });
     </script>
-<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;var a=target.closest?target.closest("a[href]"):null;if(!a||!a.href||!/^https?:\/\//.test(a.href))return;if(a.href.replace(/#.*$/,"")===loc)return;if(parent===window)return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*")},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+
+</body>
 </html>

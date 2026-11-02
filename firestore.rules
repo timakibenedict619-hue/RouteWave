@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = a document exists in /admins/{uid}
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Admin accounts: admins can read the list and create/remove admins.
+    match /admins/{uid} {
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Customer accounts. Only admins can create customers or change balances.
+    match /users/{uid} {
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+
+      // Transaction history: customer reads own, admin writes
+      match /transactions/{txId} {
+        allow read: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+        allow write: if isAdmin();
+      }
+    }
+
+    // Shipments. Public read keeps the existing tracking page working.
+    // Customer dashboards filter by customerTrackingId in the app.
+    // Only admins can create or change shipments.
+    match /shipments/{shipmentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Deny everything else by default
+  }
+}

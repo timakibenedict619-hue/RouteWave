@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • My Dashboard</title>
+<link rel="stylesheet" href="customer.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>Welcome, <span id="welcomeName">...</span></h1>
+    <p class="muted">Tracking ID: <code id="myTrackingId" style="color:#00D9FF;">-</code></p>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <a href="tracking.html" class="btn btn-outline" style="display:inline-block;">Track a Shipment</a>
+    <button id="logoutBtn" class="btn">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="summary">
+    <div class="tile">
+      <h3>Available Balance</h3>
+      <div class="big" id="myBalance">$0.00</div>
+    </div>
+    <div class="tile">
+      <h3>My Shipments</h3>
+      <div class="big" id="shipmentCount">0</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">My Shipments</h2>
+  <div class="grid" id="shipmentGrid">
+    <p class="muted">Loading...</p>
+  </div>
+
+  <h2 class="section-title">Transactions</h2>
+  <div class="list" id="transactionList">
+    <p class="muted">Loading...</p>
+  </div>
+
+</div>
+
+<script type="module" src="my-dashboard.js"></script>
+
+</body>
+</html>

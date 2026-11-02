@@ -243,6 +243,21 @@ grid-template-columns:1fr;
 <textarea id="importantUpdate" rows="4" placeholder="Enter the latest shipment update..."></textarea>
 </div>
   
+<div class="row">
+<div class="form-group">
+<label>Assign to Customer</label>
+<select id="customerTrackingId">
+<option value="">No customer (unassigned)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Shipment Photos (Cloudinary)</label>
+<input type="file" id="photos" accept="image/*" multiple>
+</div>
+</div>
+
+<div id="photoPreview" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
+
 <button type="submit">
 Create & Save Shipment
 </button>

@@ -1,14 +1,40 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 
 import {
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// Only accounts listed in the "admins" collection may use admin pages
+export async function isAdmin(user) {
+  const snapshot = await getDoc(doc(db, "admins", user.uid));
+  return snapshot.exists();
+}
+
 // Protect admin pages
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  let allowed = false;
+
+  try {
+    allowed = await isAdmin(user);
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (!allowed) {
+    alert("This account does not have admin access.");
+    await signOut(auth);
     window.location.href = "admin-login.html";
     return;
   }

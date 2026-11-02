@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Customers & Funding</title>
+
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, sans-serif; }
+
+body{ display:flex; background:#0F0F1A; color:#fff; min-height:100vh; }
+
+.sidebar{
+  width:280px; background:#111827; height:100vh; position:fixed;
+  padding:30px 20px; border-right:1px solid #1F2937;
+}
+.sidebar h2{
+  margin-bottom:40px; text-align:center; font-size:28px;
+  background:linear-gradient(135deg,#8A2BE2,#00D9FF);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.sidebar ul{ list-style:none; }
+.sidebar li{ margin:12px 0; }
+.sidebar a{
+  color:#D1D5DB; text-decoration:none; font-size:16px;
+  padding:12px 20px; display:block; border-radius:12px; transition:.3s;
+}
+.sidebar a:hover, .sidebar a.active{ background:#1F2937; color:#fff; }
+
+.main{ margin-left:280px; width:100%; padding:40px; }
+
+.header{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:36px; padding-bottom:20px; border-bottom:1px solid #1F2937;
+}
+.header h1{ font-size:30px; }
+
+.logout{
+  background:#EF4444; color:#fff; padding:12px 28px; border:none;
+  cursor:pointer; border-radius:12px; font-weight:600;
+}
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
+.panel{
+  background:#1F2937; border:1px solid #374151; border-radius:20px; padding:28px;
+}
+.panel h2{ font-size:20px; margin-bottom:18px; }
+
+.field{ margin-bottom:16px; }
+label{ display:block; font-size:14px; font-weight:600; color:#9CA3AF; margin-bottom:6px; }
+input{
+  width:100%; padding:14px 18px; background:#111827; border:1px solid #374151;
+  border-radius:12px; color:#fff; font-size:15px; outline:none;
+}
+input:focus{ border-color:#8A2BE2; box-shadow:0 0 0 3px rgba(138,43,226,.2); }
+
+.submit{
+  width:100%; padding:14px; border:none; border-radius:12px; cursor:pointer;
+  background:linear-gradient(135deg,#8A2BE2,#6A1B9A); color:#fff; font-weight:600; font-size:15px;
+}
+.submit:hover{ box-shadow:0 10px 25px rgba(138,43,226,.4); }
+.msg{ margin-top:12px; font-size:14px; min-height:18px; }
+
+table{
+  width:100%; background:#1F2937; border-collapse:collapse;
+  border-radius:16px; overflow:hidden; margin-bottom:24px;
+}
+th, td{ padding:14px 18px; text-align:left; border-bottom:1px solid #374151; }
+th{ background:#111827; color:#E5E7EB; font-weight:600; }
+tr:hover{ background:#283549; }
+code{ color:#00D9FF; }
+
+h3.section{ font-size:22px; margin:30px 0 16px; }
+
+@media (max-width: 900px){
+  .grid2{ grid-template-columns:1fr; }
+  .main{ margin-left:0; }
+  .sidebar{ position:static; width:100%; height:auto; }
+  body{ flex-direction:column; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>RouteWave</h2>
+  <ul>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="create-shipment.html">Create Shipment</a></li>
+    <li><a href="manage-shipments.html">Manage Shipments</a></li>
+    <li><a href="admin-customers.html" class="active">Customers & Funding</a></li>
+    <li><a href="tracking.html">Tracking</a></li>
+  </ul>
+</div>
+
+<div class="main">
+
+  <div class="header">
+    <h1>Customers & Funding</h1>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="grid2">
+
+    <div class="panel">
+      <h2>Create Customer</h2>
+      <form id="createCustomerForm">
+        <div class="field"><label for="cName">Full name</label><input id="cName" required></div>
+        <div class="field"><label for="cEmail">Email</label><input id="cEmail" type="email" required></div>
+        <div class="field"><label for="cPassword">Temporary password</label><input id="cPassword" type="password" minlength="6" required></div>
+        <div class="field"><label for="cBalance">Opening balance (USD)</label><input id="cBalance" type="number" min="0" step="0.01" value="0"></div>
+        <button class="submit" type="submit">Create Customer</button>
+        <p id="customerMsg" class="msg"></p>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Fund Customer Balance</h2>
+      <form id="fundForm">
+        <div class="field"><label for="fundTrackingId">Customer tracking ID</label><input id="fundTrackingId" placeholder="CUS12345678" required></div>
+        <div class="field"><label for="fundAmount">Amount (USD)</label><input id="fundAmount" type="number" min="0.01" step="0.01" required></div>
+        <div class="field"><label for="fundNote">Note (optional)</label><input id="fundNote" placeholder="e.g. Shipping payment received"></div>
+        <button class="submit" type="submit">Add to Balance</button>
+        <p id="fundMsg" class="msg"></p>
+      </form>
+    </div>
+
+  </div>
+
+  <h3 class="section">Customers</h3>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Tracking ID</th><th>Email</th><th>Balance</th></tr>
+    </thead>
+    <tbody id="customerTable"></tbody>
+  </table>
+
+  <div class="grid2">
+
+    <div class="panel">
+      <h2>Create Admin Account</h2>
+      <form id="adminForm">
+        <div class="field"><label for="aEmail">Admin email</label><input id="aEmail" type="email" required></div>
+        <div class="field"><label for="aPassword">Temporary password</label><input id="aPassword" type="password" minlength="6" required></div>
+        <button class="submit" type="submit">Create Admin</button>
+        <p id="adminMsg" class="msg"></p>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Admins</h2>
+      <table>
+        <thead><tr><th>Email</th></tr></thead>
+        <tbody id="adminTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module" src="auth.js"></script>
+<script type="module" src="admin-customers.js"></script>
+
+</body>
+</html>

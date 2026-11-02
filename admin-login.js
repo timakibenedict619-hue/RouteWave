@@ -1,13 +1,30 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+
 import {
   signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// If already logged in, go directly to admin dashboard
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "dashboard.html";
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+async function isAdmin(user) {
+  const snapshot = await getDoc(doc(db, "admins", user.uid));
+  return snapshot.exists();
+}
+
+// If already logged in as an admin, go directly to the dashboard
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+  try {
+    if (await isAdmin(user)) {
+      window.location.href = "dashboard.html";
+    }
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -31,7 +48,12 @@ loginBtn.addEventListener("click", async () => {
     loginBtn.disabled = true;
     loginBtn.textContent = "Signing in...";
 
-    await signInWithEmailAndPassword(auth, email, password);
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    if (!(await isAdmin(credential.user))) {
+      await signOut(auth);
+      throw new Error("This account does not have admin access.");
+    }
 
     window.location.href = "dashboard.html";
 
