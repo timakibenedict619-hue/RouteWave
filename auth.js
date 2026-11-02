@@ -45,6 +45,9 @@ onAuthStateChanged(auth, async (user) => {
     adminEmail.textContent = user.email;
   }
 
+  // Admin confirmed: show the page
+  document.documentElement.classList.remove("gate");
+
 });
 
 // Logout

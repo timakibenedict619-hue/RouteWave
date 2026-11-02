@@ -27,6 +27,7 @@ onAuthStateChanged(auth, (user) => {
     return;
   }
   $("userEmail").textContent = user.email || "-";
+  document.documentElement.classList.remove("gate");
 });
 
 $("logoutBtn").addEventListener("click", async () => {

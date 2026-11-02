@@ -66,6 +66,9 @@ onAuthStateChanged(auth, (user) => {
 
     const me = snap.data();
 
+    // Confirmed customer: show the page
+    document.documentElement.classList.remove("gate");
+
     $("welcomeName").textContent = me.name || me.email;
     $("myTrackingId").textContent = me.trackingId;
     $("myBalance").textContent = formatMoney(me.balance, me.currency || "USD");

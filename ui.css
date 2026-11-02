@@ -313,3 +313,6 @@ table.table tbody tr:hover{ background:#FAFBFF; }
 .track-search input:focus{ box-shadow:none; }
 .track-search .btn{ height:48px; }
 .track-body{ max-width:900px; margin:-60px auto 0; padding:0 24px 60px; position:relative; }
+
+/* Protected pages stay hidden until the login check passes */
+html.gate body{ visibility:hidden; }
