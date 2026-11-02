@@ -22,6 +22,13 @@ trackingInput.addEventListener("keypress", (e) => {
     }
 });
 
+// Opened from the home page search: ?id=TRK... fills the box and tracks it
+const presetId = new URLSearchParams(window.location.search).get("id");
+if (presetId) {
+    trackingInput.value = presetId.trim().toUpperCase();
+    trackShipment();
+}
+
 async function trackShipment() {
 
     const trackingId = trackingInput.value.trim();

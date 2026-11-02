@@ -44,6 +44,34 @@
     </div>
   </div>
 
+  <div class="card" style="margin-bottom:8px">
+    <div class="shipment-head" style="margin-bottom:14px">
+      <div>
+        <h2>Change password</h2>
+        <p class="card-sub" style="margin:0">Enter your current password, then choose a new one.</p>
+      </div>
+      <i class="fa-solid fa-shield-halved" style="color:var(--brand-1);font-size:22px"></i>
+    </div>
+    <form id="passwordForm">
+      <div class="form-grid">
+        <div class="field span-2">
+          <label for="pwCurrent">Current password</label>
+          <input type="password" id="pwCurrent" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+          <label for="pwNew">New password</label>
+          <input type="password" id="pwNew" minlength="6" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <label for="pwConfirm">Confirm new password</label>
+          <input type="password" id="pwConfirm" minlength="6" autocomplete="new-password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn" style="width:auto"><i class="fa-solid fa-key"></i>Update password</button>
+      <p id="passwordMsg" class="msg"></p>
+    </form>
+  </div>
+
   <h2 class="section-title">Messages from RouteWave</h2>
   <div class="card" id="messageList">
     <p class="empty">Loading...</p>
