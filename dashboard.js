@@ -1,4 +1,5 @@
 import { auth, db } from "./firebase.js";
+import { formatMoney } from "./currencies.js";
 
 import {
     signOut
@@ -78,7 +79,7 @@ async function loadDashboard() {
 
 }
 
-// Customer count and total balance held
+// Customer count and total balance held, grouped by currency
 async function loadCustomerStats() {
 
     try {
@@ -86,15 +87,19 @@ async function loadCustomerStats() {
         const snapshot = await getDocs(collection(db, "users"));
 
         let count = 0;
-        let total = 0;
+        const totals = {};
 
         snapshot.forEach((d) => {
+            const u = d.data();
+            const code = u.currency || "USD";
             count++;
-            total += Number(d.data().balance || 0);
+            totals[code] = (totals[code] || 0) + Number(u.balance || 0);
         });
 
         $("totalCustomers").textContent = count;
-        $("totalBalance").textContent = money(total);
+
+        const parts = Object.entries(totals).map(([code, value]) => formatMoney(value, code));
+        $("totalBalance").textContent = parts.length ? parts.join(" · ") : formatMoney(0, "USD");
 
     } catch (error) {
         console.error(error);

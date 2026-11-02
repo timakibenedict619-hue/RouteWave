@@ -98,6 +98,21 @@
     </div>
 
     <div class="card" style="margin-bottom:22px">
+      <h2>Customer account</h2>
+      <p class="card-sub">The customer's account currency. Their balance shows in this currency.</p>
+      <div class="form-grid">
+        <div class="field span-2">
+          <div id="customerAccountInfo" class="note">Loading...</div>
+        </div>
+        <div class="field span-2">
+          <label for="customerCurrency">Account currency</label>
+          <select id="customerCurrency" disabled></select>
+          <p class="hint">Changing the currency relabels the balance. It does not convert the amount.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px">
       <h2>Sender & receiver</h2>
       <p class="card-sub">Who is sending the shipment, and who receives it.</p>
       <div class="form-grid">

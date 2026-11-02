@@ -1,6 +1,7 @@
 // view-shipment.js: read-only shipment detail with live customer info
 
 import { db } from "./firebase.js";
+import { formatMoney } from "./currencies.js";
 
 import {
     doc,
@@ -115,7 +116,7 @@ function renderCustomer(c) {
 
     text("customerName", c.name);
     text("customerEmail", c.email);
-    text("customerBalance", money(c.balance));
+    text("customerBalance", formatMoney(c.balance, c.currency || "USD"));
     $("customerStatus").textContent = "Account active";
     $("customerStatus").className = "badge green";
 

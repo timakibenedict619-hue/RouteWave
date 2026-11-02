@@ -4,10 +4,15 @@ import { db } from "./firebase.js";
 import { uploadImage } from "./cloudinary.js";
 import { initTrackingField, readTrackingField } from "./tracking-field.js";
 import { initItemsEditor, readItems } from "./items-editor.js";
+import { formatMoney, populateCurrencySelect } from "./currencies.js";
 
 import {
     doc,
     getDoc,
+    getDocs,
+    collection,
+    query,
+    where,
     updateDoc,
     serverTimestamp,
     arrayUnion
@@ -99,6 +104,7 @@ async function loadShipment() {
 
         $("trackingId").value = shipment.trackingId || "";
         await initTrackingField($("trackingId"), $("trackingIdList"));
+        await loadCustomerAccount(shipment.trackingId);
 
         const fields = {
             status: shipment.status,
@@ -131,6 +137,57 @@ async function loadShipment() {
     }
 
 }
+
+// Customer account + currency for the tracking ID on this shipment
+let customerAccount = null;
+let currencyTouched = false;
+
+async function loadCustomerAccount(trackingId) {
+
+    const select = $("customerCurrency");
+    const info = $("customerAccountInfo");
+
+    customerAccount = null;
+    currencyTouched = false;
+
+    if (!trackingId) {
+        info.textContent = "Enter a tracking ID to link a customer account.";
+        populateCurrencySelect(select, "USD");
+        select.disabled = true;
+        return;
+    }
+
+    const snap = await getDocs(
+        query(collection(db, "users"), where("trackingId", "==", trackingId))
+    );
+
+    if (snap.empty) {
+        info.textContent = "No customer account for this tracking ID yet. Create one in Customers & Funding.";
+        populateCurrencySelect(select, "USD");
+        select.disabled = true;
+        return;
+    }
+
+    const account = snap.docs[0];
+    customerAccount = { ref: account.ref, ...account.data() };
+
+    info.textContent =
+        `${customerAccount.name || customerAccount.email} · balance ` +
+        formatMoney(customerAccount.balance, customerAccount.currency || "USD");
+
+    populateCurrencySelect(select, customerAccount.currency || "USD");
+    select.disabled = false;
+
+}
+
+// Changing the tracking ID loads that customer's account instead
+$("trackingId").addEventListener("change", () => {
+    loadCustomerAccount($("trackingId").value.trim().toUpperCase()).catch(console.error);
+});
+
+$("customerCurrency").addEventListener("change", () => {
+    currencyTouched = true;
+});
 
 // Save Changes
 form.addEventListener("submit", async (e) => {
@@ -203,6 +260,11 @@ form.addEventListener("submit", async (e) => {
         };
 
         await updateDoc(doc(db, "shipments", shipmentId), update);
+
+        // Save the account currency only if the admin changed it on this same account
+        if (currencyTouched && customerAccount && tracking.trackingId === customerAccount.trackingId) {
+            await updateDoc(customerAccount.ref, { currency: $("customerCurrency").value });
+        }
 
         alert("Shipment updated successfully.");
 

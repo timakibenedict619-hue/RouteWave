@@ -7,6 +7,8 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import { formatMoney } from "./currencies.js";
+
 import {
   doc,
   collection,
@@ -68,7 +70,7 @@ onAuthStateChanged(auth, (user) => {
 
     $("welcomeName").textContent = me.name || me.email;
     $("myTrackingId").textContent = me.trackingId;
-    $("myBalance").textContent = money(me.balance);
+    $("myBalance").textContent = formatMoney(me.balance, me.currency || "USD");
 
     if (!shipmentsStarted && me.trackingId) {
       shipmentsStarted = true;

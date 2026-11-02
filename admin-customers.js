@@ -2,6 +2,7 @@
 
 import { auth, db, app } from "./firebase.js";
 import { generateTrackingId, loadKnownTrackingIds } from "./tracking-field.js";
+import { formatMoney, populateCurrencySelect } from "./currencies.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -28,9 +29,7 @@ const helperAuth = getAuth(helperApp);
 
 const $ = (id) => document.getElementById(id);
 
-const money = (n) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
-        .format(Number(n || 0));
+const money = (n, code = "USD") => formatMoney(n, code);
 
 const escapeHtml = (value) =>
     String(value ?? "").replace(/[&<>"']/g, (c) => ({
@@ -80,7 +79,7 @@ async function fundByTrackingId(trackingId, amount, note) {
 
     });
 
-    return snap.docs[0].data().name;
+    return { name: snap.docs[0].data().name, currency: snap.docs[0].data().currency || "USD" };
 
 }
 
@@ -111,7 +110,7 @@ async function withdrawByTrackingId(trackingId, amount, note) {
         const current = Number(userSnap.data().balance || 0);
 
         if (amount > current) {
-            throw new Error(`Not enough funds. Available balance is ${money(current)}.`);
+            throw new Error(`Not enough funds. Available balance is ${money(current, userSnap.data().currency)}.`);
         }
 
         tx.update(userRef, { balance: current - amount });
@@ -124,7 +123,7 @@ async function withdrawByTrackingId(trackingId, amount, note) {
             createdAt: serverTimestamp()
         });
 
-        return { name: userSnap.data().name, balance: current - amount };
+        return { name: userSnap.data().name, currency: userSnap.data().currency || "USD", balance: current - amount };
 
     });
 
@@ -211,6 +210,7 @@ $("createCustomerForm").addEventListener("submit", async (e) => {
             email: email,
             trackingId: trackingId,
             balance: 0,
+            currency: $("cCurrency").value || "USD",
             role: "customer",
             createdAt: serverTimestamp()
         });
@@ -248,9 +248,9 @@ $("fundForm").addEventListener("submit", async (e) => {
 
         setMsg("fundMsg", "Funding...", true);
 
-        const name = await fundByTrackingId(trackingId, amount, note);
+        const acct = await fundByTrackingId(trackingId, amount, note);
 
-        setMsg("fundMsg", `Added ${money(amount)} to ${name || trackingId}.`, true);
+        setMsg("fundMsg", `Added ${money(amount, acct.currency)} to ${acct.name || trackingId}.`, true);
         e.target.reset();
         loadCustomers();
 
@@ -279,7 +279,7 @@ $("withdrawForm").addEventListener("submit", async (e) => {
         const result = await withdrawByTrackingId(trackingId, amount, note);
 
         setMsg("wdMsg",
-            `Withdrew ${money(amount)} from ${result.name || trackingId}. New balance: ${money(result.balance)}.`,
+            `Withdrew ${money(amount, result.currency)} from ${result.name || trackingId}. New balance: ${money(result.balance, result.currency)}.`,
             true);
         e.target.reset();
         loadCustomers();
@@ -293,5 +293,6 @@ $("withdrawForm").addEventListener("submit", async (e) => {
 
 });
 
+populateCurrencySelect($("cCurrency"), "USD");
 loadCustomers().catch(console.error);
 loadTrackingSuggestions().catch(console.error);
