@@ -17,6 +17,7 @@ import {
     doc,
     getDocs,
     setDoc,
+    onSnapshot,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -118,6 +119,39 @@ $("adminForm").addEventListener("submit", async (e) => {
         console.error(error);
         setMsg("adminMsg", error.message, false);
 
+    }
+
+});
+
+// Maintenance mode: settings/site.maintenance closes the whole website
+const siteRef = doc(db, "settings", "site");
+const maintToggle = $("maintenanceToggle");
+
+onSnapshot(siteRef, (snap) => {
+    const on = snap.exists() && snap.data().maintenance === true;
+    maintToggle.checked = on;
+    const status = $("maintenanceStatus");
+    status.textContent = on
+        ? "ON: the website is closed for everyone."
+        : "OFF: the website is open.";
+    status.style.color = on ? "#F87171" : "#34D399";
+}, (error) => console.error(error));
+
+maintToggle.addEventListener("change", async () => {
+
+    const on = maintToggle.checked;
+
+    try {
+        await setDoc(siteRef, {
+            maintenance: on,
+            updatedBy: auth.currentUser?.email || "",
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        setMsg("maintenanceMsg", on ? "Maintenance mode is on." : "Maintenance mode is off.", true);
+    } catch (error) {
+        console.error(error);
+        setMsg("maintenanceMsg", error.message, false);
+        maintToggle.checked = !on;
     }
 
 });

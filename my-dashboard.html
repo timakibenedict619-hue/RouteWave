@@ -6,90 +6,96 @@
 <title>RouteWave • My Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="ui.css">
+<style>
+  @media (max-width: 860px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:auto; position:static; }
+    .main{ margin-left:0; padding:22px 16px 40px; }
+  }
+</style>
 </head>
 <body>
 
-<header class="site-top">
-  <div class="brand">
-    <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
-    <div>
-      <div class="brand-name">RouteWave</div>
-      <div class="muted">Customer portal</div>
-    </div>
-  </div>
-  <div class="head-actions">
-    <a class="btn btn-ghost" href="tracking.html" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
-      <i class="fa-solid fa-location-dot"></i>Track a shipment
-    </a>
-    <button id="logoutBtn" class="btn btn-ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
-      <i class="fa-solid fa-right-from-bracket"></i>Logout
-    </button>
-  </div>
-</header>
+<div class="app">
 
-<main class="container">
-
-  <div class="split" style="margin-bottom:8px">
-    <div class="hero-balance">
-      <div class="label">Available balance</div>
-      <div class="amount" id="myBalance">$0.00</div>
-      <div class="meta">Welcome back, <strong id="welcomeName">...</strong></div>
-    </div>
-
-    <div class="card stat" style="align-items:flex-start;flex-direction:column;justify-content:center">
-      <div class="stat-label">Your tracking ID</div>
-      <div class="stat-value" style="font-size:22px;margin:8px 0 14px"><code id="myTrackingId">-</code></div>
-      <div class="stat-label">Shipments on your account</div>
-      <div class="stat-value" id="shipmentCount">0</div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:8px">
-    <div class="shipment-head" style="margin-bottom:14px">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
       <div>
-        <h2>Change password</h2>
-        <p class="card-sub" style="margin:0">Enter your current password, then choose a new one.</p>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Customer portal</div>
       </div>
-      <i class="fa-solid fa-shield-halved" style="color:var(--brand-1);font-size:22px"></i>
     </div>
-    <form id="passwordForm">
-      <div class="form-grid">
-        <div class="field span-2">
-          <label for="pwCurrent">Current password</label>
-          <input type="password" id="pwCurrent" autocomplete="current-password" required>
-        </div>
-        <div class="field">
-          <label for="pwNew">New password</label>
-          <input type="password" id="pwNew" minlength="6" autocomplete="new-password" required>
-        </div>
-        <div class="field">
-          <label for="pwConfirm">Confirm new password</label>
-          <input type="password" id="pwConfirm" minlength="6" autocomplete="new-password" required>
-        </div>
+
+    <div>
+      <div class="nav-label">My account</div>
+      <nav class="nav">
+        <a href="my-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i>My dashboard</a>
+        <a href="change-password.html"><i class="fa-solid fa-key"></i>Change password</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="nav-label">Tools</div>
+      <nav class="nav">
+        <a href="tracking.html"><i class="fa-solid fa-location-dot"></i>Track a shipment</a>
+      </nav>
+    </div>
+
+    <div class="sidebar-foot">
+      <div style="color:#64748B;margin-bottom:4px">Signed in as</div>
+      <div class="who" id="userEmail">-</div>
+      <button id="logoutBtn" class="btn btn-ghost btn-block" style="margin-top:12px;background:transparent;color:#fff;border-color:rgba(255,255,255,.25)">
+        <i class="fa-solid fa-right-from-bracket"></i>Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-head">
+      <div>
+        <h1>My dashboard</h1>
+        <p>Your balance, messages, shipments and tracking history.</p>
       </div>
-      <button type="submit" class="btn" style="width:auto"><i class="fa-solid fa-key"></i>Update password</button>
-      <p id="passwordMsg" class="msg"></p>
-    </form>
-  </div>
+    </div>
 
-  <h2 class="section-title">Messages from RouteWave</h2>
-  <div class="card" id="messageList">
-    <p class="empty">Loading...</p>
-  </div>
+    <div class="split" style="margin-bottom:8px">
+      <div class="hero-balance">
+        <div class="label">Available balance</div>
+        <div class="amount" id="myBalance">$0.00</div>
+        <div class="meta">Welcome back, <strong id="welcomeName">...</strong></div>
+      </div>
 
-  <h2 class="section-title">My shipments</h2>
-  <div id="shipmentGrid" class="stack">
-    <p class="empty">Loading...</p>
-  </div>
+      <div class="card stat" style="align-items:flex-start;flex-direction:column;justify-content:center">
+        <div class="stat-label">Your tracking ID</div>
+        <div class="stat-value" style="font-size:22px;margin:8px 0 14px"><code id="myTrackingId">-</code></div>
+        <div class="stat-label">Shipments on your account</div>
+        <div class="stat-value" id="shipmentCount">0</div>
+      </div>
+    </div>
 
-  <h2 class="section-title">Tracking history</h2>
-  <div id="historyList" class="stack">
-    <p class="empty">Loading...</p>
-  </div>
+    <h2 class="section-title">Messages from RouteWave</h2>
+    <div class="card" id="messageList">
+      <p class="empty">Loading...</p>
+    </div>
 
-</main>
+    <h2 class="section-title">My shipments</h2>
+    <div id="shipmentGrid" class="stack">
+      <p class="empty">Loading...</p>
+    </div>
+
+    <h2 class="section-title">Tracking history</h2>
+    <div id="historyList" class="stack">
+      <p class="empty">Loading...</p>
+    </div>
+
+  </main>
+
+</div>
 
 <script type="module" src="my-dashboard.js"></script>
 
+<script type="module" src="maintenance.js"></script>
 </body>
 </html>

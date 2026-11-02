@@ -38,6 +38,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Site settings, such as maintenance mode. Everyone can read it so the
+    // site can close for visitors; only admins can change it.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Deny everything else by default
   }
 }
