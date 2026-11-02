@@ -137,7 +137,8 @@ flex-direction:column;
 
 <div class="form-group">
 <label>Customer Tracking ID</label>
-<input type="text" id="trackingId" readonly>
+<input type="text" id="trackingId" list="trackingIdList" placeholder="Type or choose, e.g. TRK1730000000000123456" autocomplete="off" required>
+<datalist id="trackingIdList"></datalist>
 </div>
 
 <div class="form-group">
@@ -253,13 +254,6 @@ flex-direction:column;
   
 <div class="buttons">
 <div class="row">
-
-<div class="form-group">
-<label>Customer (Name · Tracking ID)</label>
-<select id="customerTrackingId">
-<option value="">No customer (unassigned)</option>
-</select>
-</div>
 
 <div class="form-group">
 <label>Add Photos</label>

@@ -87,7 +87,7 @@ onAuthStateChanged(auth, (user) => {
 function listenToShipments(trackingId) {
 
   unsubscribers.push(onSnapshot(
-    query(collection(db, "shipments"), where("customerTrackingId", "==", trackingId)),
+    query(collection(db, "shipments"), where("trackingId", "==", trackingId)),
     (snap) => {
 
       const shipments = snap.docs

@@ -1,6 +1,7 @@
 // admin-customers.js: create customers and fund balances
 
 import { auth, db, app } from "./firebase.js";
+import { generateTrackingId, loadKnownTrackingIds } from "./tracking-field.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -42,20 +43,6 @@ function setMsg(id, text, ok) {
     el.style.color = ok ? "#34D399" : "#F87171";
 }
 
-function newTrackingId() {
-    return "CUS" + Math.floor(10000000 + Math.random() * 90000000);
-}
-
-async function uniqueTrackingId() {
-    while (true) {
-        const id = newTrackingId();
-        const snap = await getDocs(
-            query(collection(db, "users"), where("trackingId", "==", id))
-        );
-        if (snap.empty) return id;
-    }
-}
-
 // Credit a customer's balance and log the transaction
 async function fundByTrackingId(trackingId, amount, note) {
 
@@ -71,7 +58,7 @@ async function fundByTrackingId(trackingId, amount, note) {
     );
 
     if (snap.empty) {
-        throw new Error("No customer found with that tracking ID.");
+        throw new Error("No customer found with that tracking ID. Create the customer first.");
     }
 
     const userRef = snap.docs[0].ref;
@@ -94,6 +81,19 @@ async function fundByTrackingId(trackingId, amount, note) {
     });
 
     return snap.docs[0].data().name;
+
+}
+
+// Suggest tracking IDs from shipments that don't have an account yet
+async function loadTrackingSuggestions() {
+
+    const known = await loadKnownTrackingIds();
+
+    const unregistered = [...known.ids].filter((id) => !known.users.has(id)).sort();
+
+    $("cTrackingList").innerHTML = unregistered
+        .map((id) => `<option value="${id}">existing shipments</option>`)
+        .join("");
 
 }
 
@@ -135,6 +135,9 @@ $("createCustomerForm").addEventListener("submit", async (e) => {
     const password = $("cPassword").value;
     const opening = Number($("cBalance").value || 0);
 
+    // Use the customer's existing tracking ID, or generate a new one
+    const trackingId = ($("cTrackingId").value.trim().toUpperCase()) || generateTrackingId();
+
     if (password.length < 6) {
         setMsg("customerMsg", "Password must be at least 6 characters.", false);
         return;
@@ -144,7 +147,13 @@ $("createCustomerForm").addEventListener("submit", async (e) => {
 
         setMsg("customerMsg", "Creating customer...", true);
 
-        const trackingId = await uniqueTrackingId();
+        const taken = await getDocs(
+            query(collection(db, "users"), where("trackingId", "==", trackingId))
+        );
+
+        if (!taken.empty) {
+            throw new Error(`Tracking ID ${trackingId} already has an account.`);
+        }
 
         const credential = await createUserWithEmailAndPassword(helperAuth, email, password);
 
@@ -167,6 +176,7 @@ $("createCustomerForm").addEventListener("submit", async (e) => {
         setMsg("customerMsg", `Customer created. Tracking ID: ${trackingId}`, true);
         e.target.reset();
         loadCustomers();
+        loadTrackingSuggestions();
 
     } catch (error) {
 
@@ -206,3 +216,4 @@ $("fundForm").addEventListener("submit", async (e) => {
 });
 
 loadCustomers().catch(console.error);
+loadTrackingSuggestions().catch(console.error);

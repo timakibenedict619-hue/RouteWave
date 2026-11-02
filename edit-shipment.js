@@ -2,7 +2,7 @@
 
 import { db } from "./firebase.js";
 import { uploadImage } from "./cloudinary.js";
-import { initCustomerPicker, getSelectedCustomer } from "./customer-picker.js";
+import { initTrackingField, readTrackingField } from "./tracking-field.js";
 import { initItemsEditor, readItems } from "./items-editor.js";
 
 import {
@@ -24,10 +24,11 @@ if (!shipmentId) {
 const $ = (id) => document.getElementById(id);
 
 const form = $("editShipmentForm");
-const customerSelect = $("customerTrackingId");
 const newPhotosInput = $("newPhotos");
 const photoList = $("photoList");
 const submitBtn = form.querySelector('button[type="submit"]');
+
+let currentShipment = {};
 
 // Photos currently on the shipment (URLs). Admin can remove any of them.
 let photos = [];
@@ -85,23 +86,19 @@ async function loadShipment() {
         }
 
         const shipment = snapshot.data();
+        currentShipment = shipment;
 
         photos = [...(shipment.photos || [])];
         renderPhotos();
 
         initItemsEditor(
-            document.getElementById("itemsEditor"),
-            document.getElementById("addItemBtn"),
+            $("itemsEditor"),
+            $("addItemBtn"),
             shipment.items || []
         );
 
-        await initCustomerPicker(
-            customerSelect,
-            $("trackingId"),
-            shipment.customerTrackingId || ""
-        );
-
         $("trackingId").value = shipment.trackingId || "";
+        await initTrackingField($("trackingId"), $("trackingIdList"));
 
         const fields = {
             status: shipment.status,
@@ -140,6 +137,13 @@ form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+    const tracking = readTrackingField($("trackingId"));
+
+    if (!tracking.trackingId) {
+        alert("Enter or choose the customer's tracking ID.");
+        return;
+    }
+
     submitBtn.disabled = true;
 
     try {
@@ -155,8 +159,6 @@ form.addEventListener("submit", async (e) => {
 
         submitBtn.textContent = "Saving...";
 
-        const customer = getSelectedCustomer(customerSelect);
-
         const status = $("status").value;
         const currentLocation = $("currentLocation").value;
 
@@ -169,11 +171,10 @@ form.addEventListener("submit", async (e) => {
 
         const update = {
 
-            // Keep the shipment on the customer's tracking ID
-            trackingId: customer ? customer.trackingId : "",
-            customerUid: customer ? customer.uid : "",
-            customerTrackingId: customer ? customer.trackingId : "",
-            customerName: customer ? customer.name : "",
+            trackingId: tracking.trackingId,
+            customerTrackingId: tracking.trackingId,
+            customerUid: tracking.uid || currentShipment.customerUid || "",
+            customerName: tracking.name || currentShipment.customerName || "",
 
             status: status,
             senderName: $("senderName").value,
@@ -193,7 +194,7 @@ form.addEventListener("submit", async (e) => {
 
             photos: [...photos, ...uploaded],
 
-            items: readItems(document.getElementById("itemsEditor")),
+            items: readItems($("itemsEditor")),
 
             updatedAt: serverTimestamp(),
             trackingHistory: arrayUnion(historyItem)

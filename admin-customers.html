@@ -104,6 +104,7 @@ h3.section{ font-size:22px; margin:30px 0 16px; }
     <div class="panel">
       <h2>Create Customer</h2>
       <form id="createCustomerForm">
+        <div class="field"><label for="cTrackingId">Tracking ID</label><input id="cTrackingId" list="cTrackingList" placeholder="Existing TRK… ID, or leave blank to generate" autocomplete="off"><datalist id="cTrackingList"></datalist></div>
         <div class="field"><label for="cName">Full name</label><input id="cName" required></div>
         <div class="field"><label for="cEmail">Email</label><input id="cEmail" type="email" required></div>
         <div class="field"><label for="cPassword">Temporary password</label><input id="cPassword" type="password" minlength="6" required></div>

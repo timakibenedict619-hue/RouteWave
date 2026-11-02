@@ -2,7 +2,7 @@
 
 import { db } from "./firebase.js";
 import { uploadImage } from "./cloudinary.js";
-import { initCustomerPicker, getSelectedCustomer } from "./customer-picker.js";
+import { initTrackingField, readTrackingField } from "./tracking-field.js";
 import { initItemsEditor, readItems } from "./items-editor.js";
 
 import {
@@ -12,14 +12,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const trackingInput = document.getElementById("trackingId");
-const customerSelect = document.getElementById("customerTrackingId");
+const trackingList = document.getElementById("trackingIdList");
 const photosInput = document.getElementById("photos");
 const photoPreview = document.getElementById("photoPreview");
 const shipmentForm = document.getElementById("shipmentForm");
 const submitBtn = shipmentForm.querySelector('button[type="submit"]');
 
-// Shipment uses the customer's own tracking ID
-initCustomerPicker(customerSelect, trackingInput);
+// Customer tracking ID (type it or pick from the list)
+initTrackingField(trackingInput, trackingList);
 
 // Items / products
 initItemsEditor(document.getElementById("itemsEditor"), document.getElementById("addItemBtn"));
@@ -47,10 +47,10 @@ shipmentForm.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const customer = getSelectedCustomer(customerSelect);
+    const tracking = readTrackingField(trackingInput);
 
-    if (!customer) {
-        alert("Please choose a customer first.");
+    if (!tracking.trackingId) {
+        alert("Enter or choose the customer's tracking ID.");
         return;
     }
 
@@ -75,11 +75,10 @@ shipmentForm.addEventListener("submit", async (e) => {
         await addDoc(collection(db, "shipments"), {
 
             // Same tracking ID the customer uses to log in
-            trackingId: customer.trackingId,
-
-            customerUid: customer.uid,
-            customerTrackingId: customer.trackingId,
-            customerName: customer.name || "",
+            trackingId: tracking.trackingId,
+            customerTrackingId: tracking.trackingId,
+            customerUid: tracking.uid,
+            customerName: tracking.name,
 
             status: status,
 
