@@ -34,16 +34,13 @@ body{ display:flex; background:#0F0F1A; color:#fff; min-height:100vh; }
   margin-bottom:36px; padding-bottom:20px; border-bottom:1px solid #1F2937;
 }
 .header h1{ font-size:30px; }
-
 .logout{
   background:#EF4444; color:#fff; padding:12px 28px; border:none;
   cursor:pointer; border-radius:12px; font-weight:600;
 }
 
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
-.panel{
-  background:#1F2937; border:1px solid #374151; border-radius:20px; padding:28px;
-}
+.panel{ background:#1F2937; border:1px solid #374151; border-radius:20px; padding:28px; }
 .panel h2{ font-size:20px; margin-bottom:18px; }
 
 .field{ margin-bottom:16px; }
@@ -63,7 +60,7 @@ input:focus{ border-color:#8A2BE2; box-shadow:0 0 0 3px rgba(138,43,226,.2); }
 
 table{
   width:100%; background:#1F2937; border-collapse:collapse;
-  border-radius:16px; overflow:hidden; margin-bottom:24px;
+  border-radius:16px; overflow:hidden;
 }
 th, td{ padding:14px 18px; text-align:left; border-bottom:1px solid #374151; }
 th{ background:#111827; color:#E5E7EB; font-weight:600; }
@@ -91,6 +88,7 @@ h3.section{ font-size:22px; margin:30px 0 16px; }
     <li><a href="manage-shipments.html">Manage Shipments</a></li>
     <li><a href="admin-customers.html" class="active">Customers & Funding</a></li>
     <li><a href="tracking.html">Tracking</a></li>
+    <li><a href="admin-settings.html">Settings</a></li>
   </ul>
 </div>
 
@@ -135,28 +133,6 @@ h3.section{ font-size:22px; margin:30px 0 16px; }
     </thead>
     <tbody id="customerTable"></tbody>
   </table>
-
-  <div class="grid2">
-
-    <div class="panel">
-      <h2>Create Admin Account</h2>
-      <form id="adminForm">
-        <div class="field"><label for="aEmail">Admin email</label><input id="aEmail" type="email" required></div>
-        <div class="field"><label for="aPassword">Temporary password</label><input id="aPassword" type="password" minlength="6" required></div>
-        <button class="submit" type="submit">Create Admin</button>
-        <p id="adminMsg" class="msg"></p>
-      </form>
-    </div>
-
-    <div class="panel">
-      <h2>Admins</h2>
-      <table>
-        <thead><tr><th>Email</th></tr></thead>
-        <tbody id="adminTable"></tbody>
-      </table>
-    </div>
-
-  </div>
 
 </div>
 

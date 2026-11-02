@@ -1,4 +1,9 @@
+// edit-shipment.js
+
 import { db } from "./firebase.js";
+import { uploadImage } from "./cloudinary.js";
+import { initCustomerPicker, getSelectedCustomer } from "./customer-picker.js";
+import { initItemsEditor, readItems } from "./items-editor.js";
 
 import {
     doc,
@@ -8,7 +13,6 @@ import {
     arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Get Shipment ID
 const params = new URLSearchParams(window.location.search);
 const shipmentId = params.get("id");
 
@@ -17,141 +21,190 @@ if (!shipmentId) {
     window.location.href = "manage-shipments.html";
 }
 
-const form = document.getElementById("editShipmentForm");
+const $ = (id) => document.getElementById(id);
 
-// Load Shipment
+const form = $("editShipmentForm");
+const customerSelect = $("customerTrackingId");
+const newPhotosInput = $("newPhotos");
+const photoList = $("photoList");
+const submitBtn = form.querySelector('button[type="submit"]');
+
+// Photos currently on the shipment (URLs). Admin can remove any of them.
+let photos = [];
+
+function renderPhotos() {
+
+    photoList.innerHTML = "";
+
+    if (photos.length === 0) {
+        photoList.innerHTML = `<span style="color:#9CA3AF">No photos yet.</span>`;
+        return;
+    }
+
+    photos.forEach((url, index) => {
+
+        const wrap = document.createElement("div");
+        wrap.style.cssText = "position:relative;width:110px";
+
+        wrap.innerHTML = `
+            <img src="${url}" alt="Shipment photo"
+                 style="width:110px;height:110px;object-fit:cover;border-radius:12px;border:1px solid #374151">
+            <button type="button" data-index="${index}"
+                style="position:absolute;top:6px;right:6px;width:28px;height:28px;margin:0;padding:0;
+                       border-radius:50%;background:#EF4444;font-size:16px;line-height:28px">×</button>
+        `;
+
+        photoList.appendChild(wrap);
+
+    });
+
+}
+
+photoList.addEventListener("click", (e) => {
+
+    const btn = e.target.closest("button[data-index]");
+
+    if (!btn) return;
+
+    photos.splice(Number(btn.dataset.index), 1);
+    renderPhotos();
+
+});
+
+// Load shipment and fill the form
 async function loadShipment() {
 
     try {
 
-        const shipmentRef = doc(db, "shipments", shipmentId);
-
-        const snapshot = await getDoc(shipmentRef);
+        const snapshot = await getDoc(doc(db, "shipments", shipmentId));
 
         if (!snapshot.exists()) {
-
             alert("Shipment not found.");
-
             window.location.href = "manage-shipments.html";
-
             return;
-
         }
 
         const shipment = snapshot.data();
 
-        document.getElementById("trackingId").value = shipment.trackingId || "";
+        photos = [...(shipment.photos || [])];
+        renderPhotos();
 
-        document.getElementById("status").value = shipment.status || "";
+        initItemsEditor(
+            document.getElementById("itemsEditor"),
+            document.getElementById("addItemBtn"),
+            shipment.items || []
+        );
 
-        document.getElementById("senderName").value = shipment.senderName || "";
+        await initCustomerPicker(
+            customerSelect,
+            $("trackingId"),
+            shipment.customerTrackingId || ""
+        );
 
-        document.getElementById("senderEmail").value = shipment.senderEmail || "";
+        $("trackingId").value = shipment.trackingId || "";
 
-        document.getElementById("senderPhone").value = shipment.senderPhone || "";
+        const fields = {
+            status: shipment.status,
+            senderName: shipment.senderName,
+            senderEmail: shipment.senderEmail,
+            senderPhone: shipment.senderPhone,
+            receiverName: shipment.receiverName,
+            receiverEmail: shipment.receiverEmail,
+            receiverPhone: shipment.receiverPhone,
+            origin: shipment.origin,
+            destination: shipment.destination,
+            carrier: shipment.carrier,
+            weight: shipment.weight,
+            currentLocation: shipment.currentLocation,
+            expectedDelivery: shipment.expectedDelivery,
+            description: shipment.description,
+            importantUpdate: shipment.importantUpdate
+        };
 
-        document.getElementById("receiverName").value = shipment.receiverName || "";
+        Object.entries(fields).forEach(([id, value]) => {
+            const el = $(id);
+            if (el) el.value = value || "";
+        });
 
-        document.getElementById("receiverEmail").value = shipment.receiverEmail || "";
-
-        document.getElementById("receiverPhone").value = shipment.receiverPhone || "";
-
-        document.getElementById("origin").value = shipment.origin || "";
-
-        document.getElementById("destination").value = shipment.destination || "";
-
-        document.getElementById("carrier").value = shipment.carrier || "";
-
-        document.getElementById("weight").value = shipment.weight || "";
-
-        document.getElementById("currentLocation").value = shipment.currentLocation || "";
-
-        document.getElementById("expectedDelivery").value = shipment.expectedDelivery || "";
-
-        document.getElementById("description").value = shipment.description || "";
-        
-document.getElementById("importantUpdate").value = shipment.importantUpdate || "";
     } catch (error) {
 
         console.error(error);
-
         alert(error.message);
 
     }
 
 }
 
-loadShipment();
-
 // Save Changes
 form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+    submitBtn.disabled = true;
+
     try {
 
-        const shipmentRef = doc(db, "shipments", shipmentId);
+        // Upload any newly chosen photos, then add them to the kept list
+        const files = [...newPhotosInput.files];
+        const uploaded = [];
 
-        const status = document.getElementById("status").value;
+        for (let i = 0; i < files.length; i++) {
+            submitBtn.textContent = `Uploading photo ${i + 1} of ${files.length}...`;
+            uploaded.push(await uploadImage(files[i]));
+        }
 
-        const location = document.getElementById("currentLocation").value;
+        submitBtn.textContent = "Saving...";
+
+        const customer = getSelectedCustomer(customerSelect);
+
+        const status = $("status").value;
+        const currentLocation = $("currentLocation").value;
 
         const historyItem = {
+            status: status,
+            location: currentLocation,
+            date: new Date().toLocaleDateString(),
+            time: new Date().toLocaleTimeString()
+        };
+
+        const update = {
+
+            // Keep the shipment on the customer's tracking ID
+            trackingId: customer ? customer.trackingId : "",
+            customerUid: customer ? customer.uid : "",
+            customerTrackingId: customer ? customer.trackingId : "",
+            customerName: customer ? customer.name : "",
 
             status: status,
+            senderName: $("senderName").value,
+            senderEmail: $("senderEmail").value,
+            senderPhone: $("senderPhone").value,
+            receiverName: $("receiverName").value,
+            receiverEmail: $("receiverEmail").value,
+            receiverPhone: $("receiverPhone").value,
+            origin: $("origin").value,
+            destination: $("destination").value,
+            carrier: $("carrier").value,
+            weight: $("weight").value,
+            currentLocation: currentLocation,
+            expectedDelivery: $("expectedDelivery").value,
+            description: $("description").value,
+            importantUpdate: $("importantUpdate").value,
 
-            location: location,
+            photos: [...photos, ...uploaded],
 
-            date: new Date().toLocaleDateString(),
+            items: readItems(document.getElementById("itemsEditor")),
 
-            time: new Date().toLocaleTimeString()
+            updatedAt: serverTimestamp(),
+            trackingHistory: arrayUnion(historyItem)
 
         };
 
-        await updateDoc(shipmentRef, {
-
-            status: status,
-
-            senderName: document.getElementById("senderName").value,
-
-            senderEmail: document.getElementById("senderEmail").value,
-
-            senderPhone: document.getElementById("senderPhone").value,
-
-            receiverName: document.getElementById("receiverName").value,
-
-            receiverEmail: document.getElementById("receiverEmail").value,
-
-            receiverPhone: document.getElementById("receiverPhone").value,
-
-            origin: document.getElementById("origin").value,
-
-            destination: document.getElementById("destination").value,
-
-            carrier: document.getElementById("carrier").value,
-
-            weight: document.getElementById("weight").value,
-
-            currentLocation: location,
-
-            expectedDelivery: document.getElementById("expectedDelivery").value,
-
-            description: document.getElementById("description").value,
-
-importantUpdate: document.getElementById("importantUpdate").value,
-
-updatedAt: serverTimestamp(),
-
-           
-
-            trackingHistory: arrayUnion(historyItem)
-
-        });
+        await updateDoc(doc(db, "shipments", shipmentId), update);
 
         alert("Shipment updated successfully.");
 
-        window.location.href =
-            `view-shipment.html?id=${shipmentId}`;
+        window.location.href = `view-shipment.html?id=${shipmentId}`;
 
     } catch (error) {
 
@@ -159,6 +212,11 @@ updatedAt: serverTimestamp(),
 
         alert(error.message);
 
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Save Changes";
+
     }
 
 });
+
+loadShipment();

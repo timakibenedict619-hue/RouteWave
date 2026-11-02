@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Settings</title>
+
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, sans-serif; }
+
+body{ display:flex; background:#0F0F1A; color:#fff; min-height:100vh; }
+
+.sidebar{
+  width:280px; background:#111827; height:100vh; position:fixed;
+  padding:30px 20px; border-right:1px solid #1F2937;
+}
+.sidebar h2{
+  margin-bottom:40px; text-align:center; font-size:28px;
+  background:linear-gradient(135deg,#8A2BE2,#00D9FF);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.sidebar ul{ list-style:none; }
+.sidebar li{ margin:12px 0; }
+.sidebar a{
+  color:#D1D5DB; text-decoration:none; font-size:16px;
+  padding:12px 20px; display:block; border-radius:12px; transition:.3s;
+}
+.sidebar a:hover, .sidebar a.active{ background:#1F2937; color:#fff; }
+
+.main{ margin-left:280px; width:100%; padding:40px; }
+
+.header{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:36px; padding-bottom:20px; border-bottom:1px solid #1F2937;
+}
+.header h1{ font-size:30px; }
+.logout{
+  background:#EF4444; color:#fff; padding:12px 28px; border:none;
+  cursor:pointer; border-radius:12px; font-weight:600;
+}
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
+.panel{ background:#1F2937; border:1px solid #374151; border-radius:20px; padding:28px; }
+.panel h2{ font-size:20px; margin-bottom:6px; }
+.panel .sub{ color:#9CA3AF; font-size:14px; margin-bottom:18px; }
+
+.kv{ display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #374151; gap:12px; }
+.kv:last-child{ border-bottom:none; }
+.kv span:first-child{ color:#9CA3AF; }
+code{ color:#00D9FF; }
+
+.field{ margin-bottom:16px; }
+label{ display:block; font-size:14px; font-weight:600; color:#9CA3AF; margin-bottom:6px; }
+input{
+  width:100%; padding:14px 18px; background:#111827; border:1px solid #374151;
+  border-radius:12px; color:#fff; font-size:15px; outline:none;
+}
+input:focus{ border-color:#8A2BE2; box-shadow:0 0 0 3px rgba(138,43,226,.2); }
+
+.btn{
+  width:100%; padding:14px; border:none; border-radius:12px; cursor:pointer;
+  background:linear-gradient(135deg,#8A2BE2,#6A1B9A); color:#fff; font-weight:600; font-size:15px;
+}
+.btn:hover{ box-shadow:0 10px 25px rgba(138,43,226,.4); }
+.btn-outline{
+  background:transparent; border:1px solid #374151; color:#D1D5DB; margin-top:12px;
+}
+.msg{ margin-top:12px; font-size:14px; min-height:18px; }
+
+table{
+  width:100%; background:#111827; border-collapse:collapse;
+  border-radius:14px; overflow:hidden; margin-bottom:18px;
+}
+th, td{ padding:12px 14px; text-align:left; border-bottom:1px solid #374151; font-size:14px; }
+th{ color:#E5E7EB; font-weight:600; background:#0F172A; }
+
+@media (max-width: 900px){
+  .grid2{ grid-template-columns:1fr; }
+  .main{ margin-left:0; }
+  .sidebar{ position:static; width:100%; height:auto; }
+  body{ flex-direction:column; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>RouteWave</h2>
+  <ul>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="create-shipment.html">Create Shipment</a></li>
+    <li><a href="manage-shipments.html">Manage Shipments</a></li>
+    <li><a href="admin-customers.html">Customers & Funding</a></li>
+    <li><a href="tracking.html">Tracking</a></li>
+    <li><a href="admin-settings.html" class="active">Settings</a></li>
+  </ul>
+</div>
+
+<div class="main">
+
+  <div class="header">
+    <h1>Settings</h1>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="grid2">
+
+    <div class="panel">
+      <h2>Your Account</h2>
+      <p class="sub">The admin account you are signed in with.</p>
+      <div class="kv"><span>Email</span><span id="accountEmail">-</span></div>
+      <button id="resetPasswordBtn" class="btn btn-outline">Send password reset email</button>
+      <p id="accountMsg" class="msg"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Connections</h2>
+      <p class="sub">Services RouteWave uses. Change these in the Cloudinary and Firebase consoles.</p>
+      <div class="kv"><span>Firebase project</span><code id="projectId">-</code></div>
+      <div class="kv"><span>Cloudinary cloud</span><code id="cloudName">-</code></div>
+      <div class="kv"><span>Upload preset</span><code id="uploadPreset">-</code></div>
+    </div>
+
+  </div>
+
+  <div class="grid2">
+
+    <div class="panel">
+      <h2>Add Admin</h2>
+      <p class="sub">New admins can sign in and manage everything in this panel.</p>
+      <form id="adminForm">
+        <div class="field"><label for="aEmail">Admin email</label><input id="aEmail" type="email" required></div>
+        <div class="field"><label for="aPassword">Temporary password</label><input id="aPassword" type="password" minlength="6" required></div>
+        <button class="btn" type="submit">Create Admin</button>
+        <p id="adminMsg" class="msg"></p>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Admin Accounts</h2>
+      <p class="sub">Everyone who can sign in to this panel.</p>
+      <table>
+        <thead><tr><th>Email</th><th>Added by</th></tr></thead>
+        <tbody id="adminTable"><tr><td colspan="2">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module" src="auth.js"></script>
+<script type="module" src="admin-settings.js"></script>
+
+</body>
+</html>

@@ -136,8 +136,9 @@ searchBtn.addEventListener("click", () => {
     }
 
     const filtered = shipments.filter(shipment =>
-        shipment.trackingId &&
-        shipment.trackingId.toLowerCase().includes(keyword)
+        true &&
+        [shipment.trackingId, shipment.customerName, shipment.receiverName]
+            .some(v => (v || "").toLowerCase().includes(keyword))
     );
 
     displayShipments(filtered);

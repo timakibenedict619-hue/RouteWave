@@ -1,4 +1,4 @@
-// admin-customers.js: create customers, fund balances, manage admins
+// admin-customers.js: create customers and fund balances
 
 import { auth, db, app } from "./firebase.js";
 
@@ -17,13 +17,11 @@ import {
     query,
     where,
     setDoc,
-    addDoc,
     runTransaction,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// A second Firebase app lets the admin create other accounts
-// without being signed out of their own session.
+// Second Firebase app so creating a customer doesn't sign the admin out
 const helperApp = initializeApp(app.options, "adminHelper");
 const helperAuth = getAuth(helperApp);
 
@@ -127,22 +125,6 @@ async function loadCustomers() {
 
 }
 
-// Admins table
-async function loadAdmins() {
-
-    const tbody = $("adminTable");
-
-    const snap = await getDocs(collection(db, "admins"));
-
-    const rows = [];
-    snap.forEach((d) => rows.push(d.data()));
-
-    tbody.innerHTML = rows.length
-        ? rows.map((a) => `<tr><td>${escapeHtml(a.email)}</td></tr>`).join("")
-        : `<tr><td>No admins found</td></tr>`;
-
-}
-
 // Create customer
 $("createCustomerForm").addEventListener("submit", async (e) => {
 
@@ -223,45 +205,4 @@ $("fundForm").addEventListener("submit", async (e) => {
 
 });
 
-// Create admin account
-$("adminForm").addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const email = $("aEmail").value.trim();
-    const password = $("aPassword").value;
-
-    if (password.length < 6) {
-        setMsg("adminMsg", "Password must be at least 6 characters.", false);
-        return;
-    }
-
-    try {
-
-        setMsg("adminMsg", "Creating admin...", true);
-
-        const credential = await createUserWithEmailAndPassword(helperAuth, email, password);
-
-        await setDoc(doc(db, "admins", credential.user.uid), {
-            email: email,
-            createdBy: auth.currentUser?.email || "",
-            createdAt: serverTimestamp()
-        });
-
-        await signOutHelper(helperAuth);
-
-        setMsg("adminMsg", `Admin account created for ${email}.`, true);
-        e.target.reset();
-        loadAdmins();
-
-    } catch (error) {
-
-        console.error(error);
-        setMsg("adminMsg", error.message, false);
-
-    }
-
-});
-
 loadCustomers().catch(console.error);
-loadAdmins().catch(console.error);

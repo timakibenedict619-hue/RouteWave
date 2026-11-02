@@ -72,7 +72,9 @@ if (!trackingId) {
 
         }
 
-        const shipment = snapshot.docs[0].data();
+        const shipment = snapshot.docs
+            .map(d => d.data())
+            .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))[0];
 
         displayShipment(shipment);
 

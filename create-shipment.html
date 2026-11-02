@@ -134,7 +134,7 @@ grid-template-columns:1fr;
 <div class="row">
 
 <div class="form-group">
-<label>Tracking ID (Auto-generated)</label>
+<label>Customer Tracking ID</label>
 <input type="text" id="trackingId" readonly>
 </div>
 
@@ -245,18 +245,24 @@ grid-template-columns:1fr;
   
 <div class="row">
 <div class="form-group">
-<label>Assign to Customer</label>
-<select id="customerTrackingId">
-<option value="">No customer (unassigned)</option>
+<label>Customer (Name · Tracking ID)</label>
+<select id="customerTrackingId" required>
+<option value="">Select a customer...</option>
 </select>
 </div>
 <div class="form-group">
-<label>Shipment Photos (Cloudinary)</label>
+<label>Shipment Photos</label>
 <input type="file" id="photos" accept="image/*" multiple>
 </div>
 </div>
 
 <div id="photoPreview" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;"></div>
+
+<div class="form-group">
+<label>Items / Products in this shipment</label>
+<div id="itemsEditor"></div>
+<button type="button" id="addItemBtn" style="width:auto;padding:12px 18px;margin-top:4px">+ Add item</button>
+</div>
 
 <button type="submit">
 Create & Save Shipment
