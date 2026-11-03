@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" class="gate">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RouteWave • Customer Chat</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i class="fa-solid fa-truck-fast"></i></div>
+      <div>
+        <div class="brand-name">RouteWave</div>
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="nav-label">Overview</div>
+      <nav class="nav">
+        <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+        <a href="create-shipment.html"><i class="fa-solid fa-circle-plus"></i>Create Shipment</a>
+        <a href="manage-shipments.html"><i class="fa-solid fa-boxes-stacked"></i>Manage Shipments</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="nav-label">Customers</div>
+      <nav class="nav">
+        <a href="admin-customers.html"><i class="fa-solid fa-wallet"></i>Customers & Funding</a>
+        <a href="admin-support.html" class="active"><i class="fa-solid fa-comments"></i>Customer chat<span class="chat-badge" id="adminChatBadge" hidden>0</span></a>
+        <a href="tracking.html"><i class="fa-solid fa-location-dot"></i>Tracking</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="nav-label">System</div>
+      <nav class="nav">
+        <a href="admin-settings.html"><i class="fa-solid fa-gear"></i>Settings</a>
+      </nav>
+    </div>
+
+    <div class="sidebar-foot">
+      <div style="color:#64748B;margin-bottom:4px">Signed in as</div>
+      <div class="who" id="adminEmail">-</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-head">
+      <div>
+        <h1>Customer chat</h1>
+        <p>Replies to customer questions. Unread messages show a count.</p>
+      </div>
+    </div>
+
+    <div class="chat-layout">
+
+      <section class="card chat-list-card">
+        <div class="chat-list-head"><h2 style="margin:0">Conversations</h2></div>
+        <div id="chatList" class="chat-list">
+          <p class="empty">Loading...</p>
+        </div>
+      </section>
+
+      <section class="card chat-pane">
+        <div id="chatEmpty" class="chat-empty">
+          <i class="fa-regular fa-comments"></i>
+          <p>Select a conversation to reply.</p>
+        </div>
+
+        <div id="chatActive" hidden style="display:flex;flex-direction:column;flex:1">
+          <div class="chat-head">
+            <div class="id" id="chatName">-</div>
+            <div class="muted" id="chatMeta" style="font-size:13px">-</div>
+          </div>
+
+          <div id="chatBody" class="chat-body"></div>
+
+          <form id="chatForm" class="chat-form">
+            <label class="btn btn-ghost attach-btn" title="Attach a photo or document"><i class="fa-solid fa-paperclip"></i><input id="chatFile" type="file" hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip"></label>
+            <input id="chatInput" type="text" maxlength="1000" placeholder="Type a reply..." autocomplete="off">
+            <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+          </form>
+          <p id="chatMsg" class="msg" style="padding:0 22px 16px;margin:0"></p>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script type="module" src="auth.js"></script>
+<script type="module" src="admin-support.js"></script>
+<script type="module" src="admin-chat-badge.js"></script>
+
+</body>
+</html>

@@ -40,3 +40,41 @@ export async function uploadImage(file, folder = "routewave/shipments") {
     // Permanent HTTPS URL, stored in Firestore
     return data.secure_url;
 }
+
+// Chat attachments: photos and common documents only
+const CHAT_FILE_TYPES = /\.(jpe?g|png|gif|webp|pdf|docx?|xlsx?|csv|txt|zip)$/i;
+
+export async function uploadChatFile(file, folder = "routewave/chat") {
+
+    if (!CHAT_FILE_TYPES.test(file.name)) {
+        throw new Error(`"${file.name}" is not a supported file type.`);
+    }
+
+    if (file.size > MAX_BYTES) {
+        throw new Error(`"${file.name}" is larger than 10 MB.`);
+    }
+
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    body.append("folder", folder);
+
+    // "auto" accepts both photos and documents
+    const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        { method: "POST", body }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error?.message || "File upload failed.");
+    }
+
+    return {
+        url: data.secure_url,
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        size: file.size
+    };
+}

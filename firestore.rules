@@ -45,6 +45,29 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Support chat: one chat per customer (chat id = customer uid).
+    // Customers and admins can read and write their own chat; admins see all.
+    match /chats/{uid} {
+      allow read, write: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+
+      match /messages/{msgId} {
+        allow read: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+        allow create: if request.resource.data.text is string
+          && request.resource.data.text.size() <= 1000
+          // An attachment must link to our Cloudinary account and have an allowed extension
+          && (!("attachment" in request.resource.data)
+            || (request.resource.data.attachment.url is string
+              && request.resource.data.attachment.url.matches("https://res[.]cloudinary[.]com/v9ef25wm/.*[.](jpe?g|png|gif|webp|pdf|docx?|xlsx?|csv|txt|zip)")
+              && request.resource.data.attachment.name is string
+              && request.resource.data.attachment.name.size() <= 200))
+          && ((request.auth.uid == uid && request.resource.data.from == "customer")
+            || (isAdmin() && request.resource.data.from == "admin"));
+        allow update, delete: if false;
+      }
+    }
+
     // Deny everything else by default
   }
 }

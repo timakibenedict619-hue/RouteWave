@@ -32,6 +32,7 @@
       <nav class="nav">
         <a href="my-dashboard.html" class="active"><i class="fa-solid fa-gauge-high"></i>My dashboard</a>
         <a href="change-password.html"><i class="fa-solid fa-key"></i>Change password</a>
+        <a href="support.html"><i class="fa-solid fa-comments"></i>Support chat<span class="chat-badge" id="customerChatBadge" hidden>0</span></a>
       </nav>
     </div>
 
@@ -75,6 +76,14 @@
       </div>
     </div>
 
+    <div class="card support-banner" style="margin-bottom:8px">
+      <div>
+        <h2 style="margin:0 0 4px">Have a question?</h2>
+        <p class="card-sub" style="margin:0">Chat with our team about your shipments or account.</p>
+      </div>
+      <a class="btn" href="support.html"><i class="fa-solid fa-comments"></i>Chat with us</a>
+    </div>
+
     <h2 class="section-title">Messages from RouteWave</h2>
     <div class="card" id="messageList">
       <p class="empty">Loading...</p>
@@ -97,5 +106,6 @@
 <script type="module" src="my-dashboard.js"></script>
 
 <script type="module" src="maintenance.js"></script>
+<script type="module" src="chat-badge.js"></script>
 </body>
 </html>
