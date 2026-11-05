@@ -63,7 +63,16 @@
     <div class="chat-layout">
 
       <section class="card chat-list-card">
-        <div class="chat-list-head"><h2 style="margin:0">Conversations</h2></div>
+        <div class="chat-list-head">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <h2 style="margin:0">Conversations</h2>
+            <button id="newChatBtn" class="btn" type="button" style="height:36px;width:auto;padding:0 14px;font-size:14px"><i class="fa-solid fa-plus"></i>New chat</button>
+          </div>
+          <div id="pickerPanel" hidden style="margin-top:14px">
+            <input id="pickerSearch" type="search" placeholder="Search by name, email or tracking ID" autocomplete="off" class="picker-search">
+            <div id="pickerResults" class="picker-results"></div>
+          </div>
+        </div>
         <div id="chatList" class="chat-list">
           <p class="empty">Loading...</p>
         </div>

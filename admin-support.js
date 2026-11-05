@@ -9,6 +9,8 @@ import {
 import {
   collection,
   doc,
+  getDoc,
+  getDocs,
   query,
   orderBy,
   onSnapshot,
@@ -25,11 +27,13 @@ import { uploadChatFile } from "./cloudinary.js";
 const $ = (id) => document.getElementById(id);
 
 const MAX_LENGTH = 1000;
+const MAX_RESULTS = 20;
 
 let selectedUid = null;
 let unsubMessages = null;
 let listStarted = false;
 let pendingFile = null;
+let customers = null; // loaded once when the picker is first opened
 
 // Conversation list, newest first
 onAuthStateChanged(auth, (user) => {
@@ -48,7 +52,7 @@ function renderList(snap) {
   list.innerHTML = "";
 
   if (snap.empty) {
-    list.appendChild(el("p", "empty", "No customer messages yet."));
+    list.appendChild(el("p", "empty", "No conversations yet. Press New chat to message a customer."));
     return;
   }
 
@@ -65,7 +69,7 @@ function renderList(snap) {
     }
 
     item.appendChild(row);
-    item.appendChild(el("div", "preview", c.lastMessage || ""));
+    item.appendChild(el("div", "preview", c.lastMessage || "No messages yet"));
     item.appendChild(el("div", "time", [c.trackingId, formatTime(c.lastAt)].filter(Boolean).join(" · ")));
 
     item.addEventListener("click", () => openChat(d.id, c));
@@ -94,11 +98,118 @@ function openChat(uid, c) {
 
   unsubMessages = onSnapshot(
     query(collection(db, "chats", uid, "messages"), orderBy("createdAt", "asc")),
-    (msgs) => renderBubbles($("chatBody"), msgs, "admin", "No messages yet."),
+    (msgs) => renderBubbles($("chatBody"), msgs, "admin", "No messages yet. Send the first message below."),
     (error) => console.error(error)
   );
 
 }
+
+// ---------- Start a chat with any customer ----------
+
+async function loadCustomers() {
+  if (customers) return customers;
+  const snap = await getDocs(collection(db, "users"));
+  customers = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  return customers;
+}
+
+function renderPicker(term) {
+
+  const results = $("pickerResults");
+  results.innerHTML = "";
+
+  if (!customers) {
+    results.appendChild(el("div", "picker-note", "Loading customers..."));
+    return;
+  }
+
+  const q = term.trim().toLowerCase();
+
+  const matches = customers
+    .filter((c) => {
+      if (!q) return true;
+      return [c.name, c.email, c.trackingId]
+        .some((value) => String(value || "").toLowerCase().includes(q));
+    })
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))
+    .slice(0, MAX_RESULTS);
+
+  if (matches.length === 0) {
+    results.appendChild(el("div", "picker-note",
+      customers.length === 0 ? "No customers yet. Create one in Customers & Funding." : "No customer matches that search."));
+    return;
+  }
+
+  matches.forEach((c) => {
+    const item = el("button", "picker-item");
+    item.type = "button";
+    item.appendChild(el("div", "pname", c.name || "Unnamed customer"));
+    item.appendChild(el("div", "psub", [c.trackingId, c.email].filter(Boolean).join(" · ")));
+    item.addEventListener("click", () => startChatWith(c));
+    results.appendChild(item);
+  });
+
+}
+
+async function startChatWith(customer) {
+
+  const msg = $("chatMsg");
+  const ref = doc(db, "chats", customer.uid);
+
+  try {
+
+    // Create the conversation only if it does not exist yet
+    let existing = await getDoc(ref);
+
+    if (!existing.exists()) {
+      await setDoc(ref, {
+        customerUid: customer.uid,
+        customerName: customer.name || "",
+        customerEmail: customer.email || "",
+        trackingId: customer.trackingId || "",
+        lastMessage: "",
+        lastAt: serverTimestamp(),
+        adminUnread: 0,
+        customerUnread: 0
+      });
+      existing = await getDoc(ref);
+    }
+
+    closePicker();
+    openChat(customer.uid, existing.data());
+
+  } catch (error) {
+    console.error(error);
+    msg.textContent = error.message;
+  }
+
+}
+
+function openPicker() {
+  $("pickerPanel").hidden = false;
+  $("pickerSearch").value = "";
+  $("pickerSearch").focus();
+  renderPicker("");
+  loadCustomers()
+    .then(() => renderPicker($("pickerSearch").value))
+    .catch((error) => {
+      console.error(error);
+      $("pickerResults").innerHTML = "";
+      $("pickerResults").appendChild(el("div", "picker-note", "Could not load customers."));
+    });
+}
+
+function closePicker() {
+  $("pickerPanel").hidden = true;
+}
+
+$("newChatBtn").addEventListener("click", () => {
+  if ($("pickerPanel").hidden) openPicker(); else closePicker();
+});
+
+$("pickerSearch").addEventListener("input", (e) => renderPicker(e.target.value));
+
+// ---------- Sending ----------
 
 // Choosing a file attaches it; it is sent with the next Send press
 $("chatFile").addEventListener("change", () => {

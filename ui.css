@@ -362,3 +362,14 @@ html.gate body{ visibility:hidden; }
 .attach-file .attach-name{ display:block; word-break:break-all; }
 .attach-file .attach-size{ display:block; font-size:12px; font-weight:500; opacity:.75; }
 .bubble-row.me .attach-file{ color:#fff; }
+
+/* ---------- Admin: start a new chat ---------- */
+.picker-search{ width:100%; height:42px; border:1px solid var(--line); border-radius:10px; padding:0 12px; background:#fff; outline:0; }
+.picker-search:focus{ border-color:var(--brand-1); }
+.picker-results{ max-height:260px; overflow-y:auto; margin-top:8px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+.picker-item{ display:block; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--line); padding:12px 14px; cursor:pointer; font:inherit; color:var(--ink); }
+.picker-item:last-child{ border-bottom:0; }
+.picker-item:hover{ background:#F8FAFC; }
+.picker-item .pname{ font-weight:600; }
+.picker-item .psub{ font-size:12.5px; color:var(--muted); margin-top:2px; word-break:break-all; }
+.picker-note{ padding:12px 14px; font-size:13.5px; color:var(--muted); }
