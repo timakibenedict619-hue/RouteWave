@@ -456,3 +456,9 @@ html.gate body{ visibility:hidden; }
   .wa-list{ max-height:300px; }
   .wa-shell{ height:72vh; min-height:460px; }
 }
+
+/* Keep wide attachments and long names inside the bubble */
+.wa-body{ overflow-x:hidden; }
+.wa-file{ min-width:0; max-width:100%; }
+.wa-file-info{ min-width:0; flex:1; }
+.wa-file-name{ max-width:100%; }

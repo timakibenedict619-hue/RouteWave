@@ -302,7 +302,9 @@ export async function buildItems(snap, { chatUid, key, role }) {
         continue;
       }
       try {
-        const body = await decryptMessage(chatUid, key, data);
+        // Stored as { body, file }; shaped here as { text, file } for display
+        const content = await decryptMessage(chatUid, key, data);
+        const body = { text: content.body || "", file: content.file || null };
         bodyCache.set(d.id, body);
         out.push({ ...base, body });
       } catch (error) {
