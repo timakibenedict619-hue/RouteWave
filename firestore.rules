@@ -9,6 +9,12 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    // A chat member is the customer it belongs to, or any admin
+    function isMember(uid) {
+      return request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+    }
+
     // Admin accounts: admins can read the list and create/remove admins.
     match /admins/{uid} {
       allow read: if request.auth != null
@@ -45,26 +51,65 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Public keys for end-to-end encryption: one entry per browser.
+    // A device can only register its own key, and only admins can register admin devices.
+    match /publicKeys/{deviceId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.publicKey is string
+        && request.resource.data.publicKey.size() <= 200
+        && (request.resource.data.role == "customer"
+          || (request.resource.data.role == "admin" && isAdmin()));
+      allow update, delete: if false;
+    }
+
+    // Online status, last seen and typing. Each person writes only their own.
+    // Customers can see admin status; admins can see everyone's.
+    match /presence/{uid} {
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin() || resource.data.role == "admin");
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // Support chat: one chat per customer (chat id = customer uid).
-    // Customers and admins can read and write their own chat; admins see all.
+    // Members are that customer and all admins.
     match /chats/{uid} {
-      allow read, write: if request.auth != null
-        && (request.auth.uid == uid || isAdmin());
+      allow read, write: if isMember(uid);
+
+      // Encrypted copies of the chat key, one per member device.
+      // Create-only: an entry can never be replaced, so keys cannot be swapped silently.
+      match /keys/{deviceId} {
+        allow read: if isMember(uid);
+        allow create: if isMember(uid)
+          && request.resource.data.senderDeviceId is string
+          && request.resource.data.iv is string
+          && request.resource.data.wrapped is string
+          && request.resource.data.wrapped.size() <= 300;
+        allow update, delete: if false;
+      }
 
       match /messages/{msgId} {
-        allow read: if request.auth != null
-          && (request.auth.uid == uid || isAdmin());
-        allow create: if request.resource.data.text is string
-          && request.resource.data.text.size() <= 1000
-          // An attachment must link to our Cloudinary account and have an allowed extension
-          && (!("attachment" in request.resource.data)
-            || (request.resource.data.attachment.url is string
-              && request.resource.data.attachment.url.matches("https://res[.]cloudinary[.]com/v9ef25wm/.*[.](jpe?g|png|gif|webp|pdf|docx?|xlsx?|csv|txt|zip)")
-              && request.resource.data.attachment.name is string
-              && request.resource.data.attachment.name.size() <= 200))
+        allow read: if isMember(uid);
+
+        // Ciphertext only. The sender must be the signed-in account on its own side of the chat.
+        allow create: if request.resource.data.v == 2
+          && request.resource.data.iv is string
+          && request.resource.data.iv.size() <= 32
+          && request.resource.data.ct is string
+          && request.resource.data.ct.size() <= 30000
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.deliveredAt == null
+          && request.resource.data.readAt == null
           && ((request.auth.uid == uid && request.resource.data.from == "customer")
             || (isAdmin() && request.resource.data.from == "admin"));
-        allow update, delete: if false;
+
+        // Only the receiving side can mark a message as delivered or read
+        allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(["deliveredAt", "readAt"])
+          && ((request.auth.uid == uid && resource.data.from == "admin")
+            || (isAdmin() && resource.data.from == "customer"));
+
+        allow delete: if false;
       }
     }
 

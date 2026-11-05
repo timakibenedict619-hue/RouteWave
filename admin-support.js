@@ -1,4 +1,5 @@
-// admin-support.js: admin inbox for customer chats
+// admin-support.js: admin side of the customer chat.
+// Messages and files are encrypted in this browser before they are sent.
 
 import { auth, db } from "./firebase.js";
 
@@ -14,15 +15,29 @@ import {
   query,
   orderBy,
   onSnapshot,
-  addDoc,
   setDoc,
   updateDoc,
-  serverTimestamp,
-  increment
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import { el, formatTime, renderBubbles } from "./chat-common.js";
-import { uploadChatFile } from "./cloudinary.js";
+import {
+  el,
+  avatar,
+  initials,
+  shortTime,
+  isOnline,
+  renderThread,
+  buildItems,
+  acknowledge,
+  sendSecure,
+  watchRolePresence,
+  headerStatus,
+  typingNow,
+  retryUntil,
+  isVisible
+} from "./chat-common.js";
+import { registerDevice, ensureChatKey, checkChatFile } from "./secure-chat.js";
+import { notifyTyping, stopTyping } from "./presence.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -30,48 +45,92 @@ const MAX_LENGTH = 1000;
 const MAX_RESULTS = 20;
 
 let selectedUid = null;
+let selected = null;        // summary of the open conversation
+let key = null;             // chat key for selectedUid
+let lastSnap = null;
+let items = [];
 let unsubMessages = null;
+let stopKeyLoop = null;
 let listStarted = false;
 let pendingFile = null;
-let customers = null; // loaded once when the picker is first opened
+let customers = null;       // loaded once when the picker is first opened
+let chatsSnap = null;
+let customerPresence = new Map();
 
-// Conversation list, newest first
-onAuthStateChanged(auth, (user) => {
+// Conversation list and customer presence
+onAuthStateChanged(auth, async (user) => {
+
   if (!user || listStarted) return;
   listStarted = true;
+
+  try {
+    await registerDevice("admin");
+  } catch (error) {
+    console.error(error);
+  }
+
   onSnapshot(
     query(collection(db, "chats"), orderBy("lastAt", "desc")),
-    renderList,
+    (snap) => {
+      chatsSnap = snap;
+      renderList();
+      renderHeader();
+    },
     (error) => console.error(error)
   );
+
+  watchRolePresence("customer", (list) => {
+    customerPresence = new Map(list.map((p) => [p.id, p]));
+    renderList();
+    renderHeader();
+  });
+
+  // Refresh "last seen" wording once a minute
+  setInterval(() => {
+    renderList();
+    renderHeader();
+  }, 60000);
+
 });
 
-function renderList(snap) {
+function renderList() {
 
   const list = $("chatList");
   list.innerHTML = "";
 
-  if (snap.empty) {
+  if (!chatsSnap) return;
+
+  if (chatsSnap.empty) {
     list.appendChild(el("p", "empty", "No conversations yet. Press New chat to message a customer."));
     return;
   }
 
-  snap.forEach((d) => {
+  chatsSnap.forEach((d) => {
 
     const c = d.data();
-    const item = el("button", "chat-item" + (d.id === selectedUid ? " active" : ""));
+    const name = c.customerName || c.customerEmail || "Customer";
+    const presence = customerPresence.get(d.id);
+
+    const item = el("button", "wa-item" + (d.id === selectedUid ? " active" : ""));
     item.type = "button";
 
-    const row = el("div", "row");
-    row.appendChild(el("span", "name", c.customerName || c.customerEmail || "Customer"));
+    item.appendChild(avatar(name, { online: isOnline(presence?.lastSeen), size: "sm" }));
+
+    const body = el("div", "wa-item-body");
+
+    const top = el("div", "wa-item-top");
+    top.appendChild(el("span", "wa-item-name", name));
+    top.appendChild(el("span", "wa-item-time", shortTime(c.lastAt)));
+    body.appendChild(top);
+
+    const bottom = el("div", "wa-item-bottom");
+    bottom.appendChild(el("span", "wa-item-preview", c.lastMessage || "No messages yet"));
     if ((c.adminUnread || 0) > 0) {
-      row.appendChild(el("span", "unread-pill", String(c.adminUnread)));
+      bottom.appendChild(el("span", "wa-count", String(c.adminUnread)));
     }
+    body.appendChild(bottom);
 
-    item.appendChild(row);
-    item.appendChild(el("div", "preview", c.lastMessage || "No messages yet"));
-    item.appendChild(el("div", "time", [c.trackingId, formatTime(c.lastAt)].filter(Boolean).join(" · ")));
-
+    item.appendChild(body);
     item.addEventListener("click", () => openChat(d.id, c));
     list.appendChild(item);
 
@@ -79,13 +138,38 @@ function renderList(snap) {
 
 }
 
+function renderHeader() {
+  if (!selectedUid) return;
+  const p = customerPresence.get(selectedUid);
+  const status = headerStatus(p?.lastSeen ?? null, typingNow(p, selectedUid));
+  const node = $("chatStatus");
+  node.textContent = status.text;
+  node.classList.toggle("online", status.online);
+}
+
+function updateLock() {
+  $("lockText").textContent = key
+    ? "End-to-end encrypted. Messages and files can be read only on signed-in team and customer devices."
+    : "Waiting for this chat's key. It appears here automatically once a device that holds it shares it.";
+}
+
+function stopThread() {
+  if (unsubMessages) unsubMessages();
+  unsubMessages = null;
+  if (stopKeyLoop) stopKeyLoop();
+  stopKeyLoop = null;
+}
+
 function openChat(uid, c) {
 
   selectedUid = uid;
+  selected = c;
 
+  const name = c.customerName || c.customerEmail || "Customer";
   $("chatEmpty").hidden = true;
   $("chatActive").hidden = false;
-  $("chatName").textContent = c.customerName || "Customer";
+  $("chatName").textContent = name;
+  $("chatAvatar").textContent = initials(name);
   $("chatMeta").textContent = [c.trackingId, c.customerEmail].filter(Boolean).join(" · ");
   $("chatMsg").textContent = "";
 
@@ -94,15 +178,51 @@ function openChat(uid, c) {
     updateDoc(doc(db, "chats", uid), { adminUnread: 0 }).catch(console.error);
   }
 
-  if (unsubMessages) unsubMessages();
+  stopThread();
+  key = null;
+  lastSnap = null;
+  items = [];
+  updateLock();
+  renderHeader();
 
   unsubMessages = onSnapshot(
     query(collection(db, "chats", uid, "messages"), orderBy("createdAt", "asc")),
-    (msgs) => renderBubbles($("chatBody"), msgs, "admin", "No messages yet. Send the first message below."),
+    async (msgs) => {
+      lastSnap = msgs;
+      await renderMessages();
+    },
     (error) => console.error(error)
   );
 
+  // Get this chat's key, and keep trying until it is available
+  stopKeyLoop = retryUntil(async () => {
+    const k = await ensureChatKey(uid);
+    if (uid !== selectedUid) return true;
+    if (k && k !== key) {
+      key = k;
+      updateLock();
+      await renderMessages();
+    }
+    return false;
+  }, 20000);
+
+  renderList();
+
 }
+
+async function renderMessages() {
+  const uid = selectedUid;
+  if (!uid || !lastSnap) return;
+  const built = await buildItems(lastSnap, { chatUid: uid, key, role: "admin" });
+  if (uid !== selectedUid) return; // the reader has moved to another chat
+  items = built;
+  renderThread($("chatBody"), items, "No messages yet. Send the first message below.");
+  acknowledge(uid, items, isVisible());
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (isVisible() && selectedUid && items.length) acknowledge(selectedUid, items, true);
+});
 
 // ---------- Start a chat with any customer ----------
 
@@ -214,62 +334,75 @@ $("pickerSearch").addEventListener("input", (e) => renderPicker(e.target.value))
 // Choosing a file attaches it; it is sent with the next Send press
 $("chatFile").addEventListener("change", () => {
   pendingFile = $("chatFile").files[0] || null;
-  $("chatMsg").textContent = pendingFile
-    ? `Ready to send: ${pendingFile.name}. Add a note or press Send.`
-    : "";
+  $("chatMsg").textContent = pendingFile ? `Ready to send: ${pendingFile.name}` : "";
 });
+
+$("chatInput").addEventListener("input", () => {
+  if (!selectedUid) return;
+  if ($("chatInput").value.trim()) notifyTyping(selectedUid);
+  else stopTyping();
+});
+
+$("chatInput").addEventListener("blur", () => stopTyping());
 
 $("chatForm").addEventListener("submit", async (e) => {
 
   e.preventDefault();
 
+  const uid = selectedUid;
+  if (!uid) return;
+
   const input = $("chatInput");
   const fileInput = $("chatFile");
-  const text = input.value.trim();
   const msg = $("chatMsg");
-  const button = e.target.querySelector("button[type='submit']");
+  const button = $("sendBtn");
+  const text = input.value.trim();
+  const file = pendingFile;
 
   msg.textContent = "";
 
-  if (!text && !pendingFile) return;
-  if (!selectedUid) return;
+  if (!text && !file) return;
 
   if (text.length > MAX_LENGTH) {
     msg.textContent = `Please keep replies under ${MAX_LENGTH} characters.`;
     return;
   }
 
-  const file = pendingFile;
   button.disabled = true;
 
   try {
 
-    let attachment = null;
+    const k = key || await ensureChatKey(uid);
+    if (uid === selectedUid && !key) key = k;
 
-    if (file) {
-      msg.textContent = `Uploading ${file.name}...`;
-      attachment = await uploadChatFile(file);
+    if (!k) {
+      msg.textContent = "This chat is still waiting for its key. Ask the customer to sign in on their device, then try again.";
+      return;
     }
 
-    await addDoc(collection(db, "chats", selectedUid, "messages"), {
-      text: text,
-      from: "admin",
-      senderEmail: auth.currentUser?.email || "",
-      createdAt: serverTimestamp(),
-      ...(attachment ? { attachment } : {})
+    if (file) {
+      checkChatFile(file);
+      msg.textContent = `Encrypting and uploading ${file.name}...`;
+    }
+
+    await sendSecure({
+      chatUid: uid,
+      key: k,
+      role: "admin",
+      senderUid: auth.currentUser.uid,
+      text,
+      file,
+      unreadField: "customerUnread",
+      summary: {}
     });
 
-    // Update the summary and count the reply as unread for the customer
-    await setDoc(doc(db, "chats", selectedUid), {
-      lastMessage: (text || `Attachment: ${attachment.name}`).slice(0, 140),
-      lastAt: serverTimestamp(),
-      customerUnread: increment(1)
-    }, { merge: true });
-
-    input.value = "";
-    fileInput.value = "";
-    pendingFile = null;
-    msg.textContent = "";
+    if (uid === selectedUid) {
+      input.value = "";
+      fileInput.value = "";
+      pendingFile = null;
+      msg.textContent = "";
+    }
+    stopTyping();
 
   } catch (error) {
     console.error(error);

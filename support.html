@@ -61,27 +61,29 @@
       </div>
     </div>
 
-    <section class="card chat-pane" style="max-width:880px;min-height:560px">
-      <div class="chat-head" style="display:flex;align-items:center;gap:14px">
-        <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--brand-1),#0E7490);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px">
-          <i class="fa-solid fa-headset"></i>
+    <section class="wa-shell wa-solo">
+
+      <header class="wa-head">
+        <div class="wa-avatar support"><i class="fa-solid fa-headset"></i></div>
+        <div class="wa-head-text">
+          <div class="wa-title">RouteWave Support</div>
+          <div id="chatStatus" class="wa-status">Support team</div>
         </div>
-        <div>
-          <div class="id">RouteWave Support</div>
-          <div class="muted" style="font-size:13px">We reply here as soon as possible</div>
-        </div>
+      </header>
+
+      <div class="wa-lock"><i class="fa-solid fa-lock"></i><span id="lockText">Securing this chat...</span></div>
+
+      <div id="chatBody" class="wa-body">
+        <p class="wa-empty">Loading...</p>
       </div>
 
-      <div id="chatBody" class="chat-body">
-        <p class="empty">Loading...</p>
-      </div>
-
-      <form id="chatForm" class="chat-form">
-        <label class="btn btn-ghost attach-btn" title="Attach a photo or document"><i class="fa-solid fa-paperclip"></i><input id="chatFile" type="file" hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip"></label>
-        <input id="chatInput" type="text" maxlength="1000" placeholder="Type your question..." autocomplete="off">
-        <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+      <form id="chatForm" class="wa-form">
+        <label class="wa-icon-btn" title="Attach a photo or document"><i class="fa-solid fa-paperclip"></i><input id="chatFile" type="file" hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip"></label>
+        <input id="chatInput" type="text" maxlength="1000" placeholder="Type a message" autocomplete="off">
+        <button id="sendBtn" class="wa-send" type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
       </form>
-      <p id="chatMsg" class="msg" style="padding:0 22px 16px;margin:0"></p>
+      <p id="chatMsg" class="wa-msg"></p>
+
     </section>
 
   </main>
@@ -91,6 +93,7 @@
 <script type="module" src="support.js"></script>
 <script type="module" src="chat-badge.js"></script>
 <script type="module" src="maintenance.js"></script>
+<script type="module" src="presence.js" data-role="customer"></script>
 
 </body>
 </html>

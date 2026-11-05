@@ -78,3 +78,29 @@ export async function uploadChatFile(file, folder = "routewave/chat") {
         size: file.size
     };
 }
+
+// Encrypted attachments: the browser has already encrypted the file, so it goes up as a raw blob
+export async function uploadRawBlob(blob, folder = "routewave/chat-encrypted") {
+
+    if (blob.size > MAX_BYTES + 1024) {
+        throw new Error("This file is larger than 10 MB.");
+    }
+
+    const body = new FormData();
+    body.append("file", blob, "encrypted.bin");
+    body.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    body.append("folder", folder);
+
+    const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`,
+        { method: "POST", body }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error?.message || "File upload failed.");
+    }
+
+    return data.secure_url;
+}

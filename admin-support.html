@@ -56,49 +56,60 @@
     <div class="page-head">
       <div>
         <h1>Customer chat</h1>
-        <p>Replies to customer questions. Unread messages show a count.</p>
+        <p>Replies to customer questions. Messages are end-to-end encrypted.</p>
       </div>
     </div>
 
-    <div class="chat-layout">
+    <div class="wa-layout">
 
-      <section class="card chat-list-card">
-        <div class="chat-list-head">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-            <h2 style="margin:0">Conversations</h2>
-            <button id="newChatBtn" class="btn" type="button" style="height:36px;width:auto;padding:0 14px;font-size:14px"><i class="fa-solid fa-plus"></i>New chat</button>
+      <section class="wa-list">
+        <div class="wa-list-head">
+          <div class="wa-list-title">
+            <h2>Conversations</h2>
+            <button id="newChatBtn" class="btn wa-new" type="button"><i class="fa-solid fa-plus"></i>New chat</button>
           </div>
-          <div id="pickerPanel" hidden style="margin-top:14px">
+          <div id="pickerPanel" class="wa-picker" hidden>
             <input id="pickerSearch" type="search" placeholder="Search by name, email or tracking ID" autocomplete="off" class="picker-search">
             <div id="pickerResults" class="picker-results"></div>
           </div>
         </div>
-        <div id="chatList" class="chat-list">
+        <div id="chatList" class="wa-items">
           <p class="empty">Loading...</p>
         </div>
       </section>
 
-      <section class="card chat-pane">
-        <div id="chatEmpty" class="chat-empty">
-          <i class="fa-regular fa-comments"></i>
-          <p>Select a conversation to reply.</p>
+      <section class="wa-shell">
+
+        <div id="chatEmpty" class="wa-empty-pane">
+          <i class="fa-solid fa-comments"></i>
+          <p>Select a conversation to reply</p>
+          <small><i class="fa-solid fa-lock"></i> Messages are end-to-end encrypted</small>
         </div>
 
-        <div id="chatActive" hidden style="display:flex;flex-direction:column;flex:1">
-          <div class="chat-head">
-            <div class="id" id="chatName">-</div>
-            <div class="muted" id="chatMeta" style="font-size:13px">-</div>
-          </div>
+        <div id="chatActive" class="wa-active" hidden>
 
-          <div id="chatBody" class="chat-body"></div>
+          <header class="wa-head">
+            <div class="wa-avatar" id="chatAvatar">-</div>
+            <div class="wa-head-text">
+              <div class="wa-title" id="chatName">-</div>
+              <div id="chatStatus" class="wa-status"></div>
+              <div id="chatMeta" class="wa-sub"></div>
+            </div>
+          </header>
 
-          <form id="chatForm" class="chat-form">
-            <label class="btn btn-ghost attach-btn" title="Attach a photo or document"><i class="fa-solid fa-paperclip"></i><input id="chatFile" type="file" hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip"></label>
-            <input id="chatInput" type="text" maxlength="1000" placeholder="Type a reply..." autocomplete="off">
-            <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>Send</button>
+          <div class="wa-lock"><i class="fa-solid fa-lock"></i><span id="lockText">Waiting for this chat's key...</span></div>
+
+          <div id="chatBody" class="wa-body"></div>
+
+          <form id="chatForm" class="wa-form">
+            <label class="wa-icon-btn" title="Attach a photo or document"><i class="fa-solid fa-paperclip"></i><input id="chatFile" type="file" hidden accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip"></label>
+            <input id="chatInput" type="text" maxlength="1000" placeholder="Type a reply" autocomplete="off">
+            <button id="sendBtn" class="wa-send" type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
           </form>
-          <p id="chatMsg" class="msg" style="padding:0 22px 16px;margin:0"></p>
+          <p id="chatMsg" class="wa-msg"></p>
+
         </div>
+
       </section>
 
     </div>
@@ -110,6 +121,7 @@
 <script type="module" src="auth.js"></script>
 <script type="module" src="admin-support.js"></script>
 <script type="module" src="admin-chat-badge.js"></script>
+<script type="module" src="presence.js" data-role="admin"></script>
 
 </body>
 </html>
